@@ -20,61 +20,18 @@
 int
 main(int argc, char const *argv[])
 {
-	// Test to see if user has entered the file name or not.
-	if (argc != 2)
-	{
-		fprintf(stderr, "Please enter valid arguments. Program exiting.\n");
-		goto end;
-	}
 
-	char *periodicJobFileName = argv[1];
-	printf("The file entered is: %s\n", periodicJobFileName);
-
-	FILE *periodicJobFile = fopen(periodicJobFileName, "r");
-	// Checking if there is an error.
-	if (!periodicJobFile)
-	{
-		fprintf(stderr, "Could not open file: %sProgram exiting.\n", periodicJobFileName);
-		goto end;
-	}
-
-	// Taking data from the periodsic job file.
+	FILE *periodicJobFile = firstCheck(argc, argv);
 	int numLines;
-	fscanf(periodicJobFile, " %d", &numLines);
-	printf("No. of lines = %d.\n", numLines);
-
-	Task *tasks = (Task *) malloc(sizeof(Task) * numLines);
-	int i;
-	for (i = 0; i < numLines; i++)
-	{
-		fscanf(periodicJobFile, "%d %d %d", &tasks[i].period, &tasks[i].wcet, &tasks[i].deadline);
-		// printf("%d %d %d\n", tasks[i].period, tasks[i].wcet, tasks[i].deadline);
-
-		if (tasks[i].wcet > tasks[i].deadline)
-		{
-			fprintf(stderr, "WCET is greater than deadline. Please input valid data.\n" );
-			fclose(periodicJobFile);
-			goto free;
-		}
-	}
-	fclose(periodicJobFile);
-
-	float cpuUtilisation = calculateCpuUtilisation(tasks, numLines);
-	if (cpuUtilisation < 1.0f)
-	{
-		printf("CPU Utilisation < 1: might be schedulable.\n");
-	}
-	else
-	{
-		fprintf(stderr, "CPU Utilisation >= 1: cannot be scheduled\n");
-		goto free;
-	}
-
+	Task *tasks = periodicTaskInput(periodicJobFile, &numLines);
+	checkCpuUtilisation(tasks, numLines);
 
 	int hyperperiod = findHyperPeriod(tasks, numLines);
 	printf("The hyperperiod is: %d.\n", hyperperiod);
-
-
+	
+	// conditionChecker(tasks, numLines, hyperperiod);
+	
+	//
 	int condition1Size = frameSizeCondition1(tasks, numLines);
 	printf("Condition-1: %d\n", condition1Size);
 
@@ -113,7 +70,7 @@ main(int argc, char const *argv[])
 		printf("%d ", condition3Sizes[i]);
 	}
 	printf("\n");
-
+	//
 
 	int numTasks = numLines;
 
@@ -191,11 +148,11 @@ main(int argc, char const *argv[])
 	printJobInfo(jobs, numJobs);
 
 	int frameSize = condition3Sizes[condition1Index];
-	printf("frameSize=%d. Trying to create a schedule\n", frameSize);
+	printf("frameSize=%d. Trying to create a schedule\nnumFrames=%d\n", frameSize, hyperperiod / frameSize);
 	Frame *frames = (Frame *) malloc(sizeof(Frame) * (hyperperiod / frameSize));
 	calculateSchedule(jobs, numJobs, frameSize, hyperperiod, frames);
 
-	// printFrameInfo(frames, hyperperiod / frameSize);
+	printFrameInfo(frames, hyperperiod / frameSize);
 
 
 	free(condition2Sizes);

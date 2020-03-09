@@ -13,14 +13,15 @@ calculateSchedule(TaskInstance *jobs, int numJobs, int frameSize, int hyperperio
 	int numOfFrames = hyperperiod / frameSize;
 
 	int aliveCount = numJobs;
-	printf("initial aliveCount=%d\n", aliveCount);
-	printf("hyperperiod=%d, frameSize=%d, numOfFrames=%d\n", hyperperiod, frameSize, numOfFrames);
+	// printf("initial aliveCount=%d\n", aliveCount);
+	// printf("hyperperiod=%d, frameSize=%d, numOfFrames=%d\n", hyperperiod, frameSize, numOfFrames);
 	for (int f = 0; f < numOfFrames; ++f)
 	{
-		printf("Frame No=%d\nJobs=", f);
+		// printf("Frame No=%d\nJobs=", f);
 		frames[f].numFrame = f;
 		frames[f].numJobs = 0;
-		// frames[f].jobs = (TaskInstance **) malloc(sizeof(TaskInstance *) * aliveCount);
+		fflush(stdout);
+		frames[f].jobs = (TaskInstance *) malloc(sizeof(TaskInstance) * aliveCount);
 
 		bool flag = true;
 		int minIndex;
@@ -59,30 +60,31 @@ calculateSchedule(TaskInstance *jobs, int numJobs, int frameSize, int hyperperio
 			if (!flag)
 				break;
 			// printf("minIndex=%d\n", minIndex);
-			printf("J%d,%d; ", jobs[minIndex].taskNum, jobs[minIndex].instanceNum);
-			// frames[f].jobs[numJobs] = &jobs[minIndex];
+			// printf("J%d,%d; ", jobs[minIndex].taskNum, jobs[minIndex].instanceNum);
+			// fflush(stdout);
+			frames[f].jobs[frames[f].numJobs] = jobs[minIndex];
 			frames[f].numJobs++;
 			jobs[minIndex].alive = false;
 			aliveCount--;
 			timeLeft -= jobs[minIndex].wcet;
 		}
 
-		printf("frames[f].numJobs=%d\n", frames[f].numJobs);
+		// printf("numJobs=%d, jobsAlive=%d\n", frames[f].numJobs, aliveCount);
 		fflush(stdout);
-		// frames[f].jobs = (TaskInstance **) realloc(frames[f].jobs, sizeof(TaskInstance *) * frames[f].numJobs);
+		frames[f].jobs = (TaskInstance *) realloc(frames[f].jobs, sizeof(TaskInstance) * frames[f].numJobs);
 		// printf("numJobs in Frame-%d is: %d", f, frames[f].numJobs);
-		printf("\n");
+		// printf("\n");
 	}
 
-	printf("final aliveCount=%d\n", aliveCount);
-	if (aliveCount > 0)
-	{
-		printf("Could not schedule this set.\n");
-	}
-	else
-	{
-		printf("Schedule has been made!!\n");
-	}
+	// printf("final aliveCount=%d\n", aliveCount);
+	// if (aliveCount > 0)
+	// {
+	// 	printf("Could not schedule this set.\n");
+	// }
+	// else
+	// {
+	// 	printf("Schedule has been made!!\n");
+	// }
 
 	// Resetting the jobs so that they can be scheduled again.
 	for (int i = 0; i < numJobs; i++)

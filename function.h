@@ -9,3 +9,7 @@ void calculateSchedule(TaskInstance *, int, int, int, Frame *);
 void printTaskInfo(Task *, int);
 void printJobInfo(TaskInstance *, int);
 void printFrameInfo(Frame *, int);
+FILE *firstCheck(int, char *[]);
+Task *periodicTaskInput(FILE *, int *);
+void checkCpuUtilisation(Task*, int);
+void conditionChecker(Task *, int, int);

@@ -48,7 +48,12 @@ printFrameInfo(Frame * frames, int numFrames)
 		printf("Frame no.%d, Jobs=\n", f);
 		for (int i = 0; i < frames[f].numJobs; ++i)
 		{
-			printf("\tJob%d Instance=%d\n", frames[f].jobs[i]->taskNum, frames[f].jobs[i]->instanceNum);
+			if (frames[f].jobs[i].splitNum == -1)
+			{
+				printf("\tJob%d Instance=%d\n", frames[f].jobs[i].taskNum, frames[f].jobs[i].instanceNum);
+			}
+			else
+				printf("\tJob%d,%d Instance=%d\n", frames[f].jobs[i].taskNum, frames[f].jobs[i].splitNum, frames[f].jobs[i].instanceNum);
 		}
 	}
 }
