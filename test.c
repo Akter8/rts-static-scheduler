@@ -13,36 +13,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
-
-
-typedef struct
-{
-	int period;
-	int deadline;
-	int wcet;
-	int numOfSplits;
-	int *splits;
-
-}Task;
-
-typedef struct
-{
-	int startFrame;
-	int maxFrame;
-	int wcet;
-	int taskNum;
-	int splitNum;
-	int instanceNum;
-}TaskInstance;
-
-
-int findHyperPeriod(Task *, int);
-int gcd(int, int);
-int frameSizeCondition1(Task *, int);
-int frameSizeCondition2(int, int *);
-int frameSizeCondition3(int *, Task *, int, int, int *);
-void createTaskInstances(Task *, TaskInstance *, int, int, int, int);
-void calculateSchedule(TaskInstance *, int, int, int);
+#include "struct.h"
+#include "function.h"
 
 
 int
@@ -86,6 +58,17 @@ main(int argc, char const *argv[])
 		}
 	}
 
+	float cpuUtilisation = calculateCpuUtilisation(tasks, numLines);
+	if (cpuUtilisation < 1.0f)
+	{
+		printf("CPU Utilisation < 1: might be schedulable.\n");
+	}
+	else
+	{
+		fprintf(stderr, "CPU Utilisation >= 1: cannot be scheduled\n");
+		goto free;
+	}
+
 
 	int hyperperiod = findHyperPeriod(tasks, numLines);
 	printf("The hyperperiod is: %d.\n", hyperperiod);
@@ -103,7 +86,7 @@ main(int argc, char const *argv[])
 	for (int i = 0; i < reallocSize; ++i)
 	{
 		printf("%d ", condition2Sizes[i]);
-		if(condition2Sizes[i] < condition1Size)
+		if(condition2Sizes[i] <= condition1Size)
 			condition1Index1++;
 	}
 	printf("\n");
@@ -117,7 +100,7 @@ main(int argc, char const *argv[])
 	for (int i = 0; i < reallocSize; ++i)
 	{
 		printf("%d ", condition3Sizes[i]);
-		if(condition3Sizes[i] < condition1Size)
+		if(condition3Sizes[i] <= condition1Size)
 			condition1Index2++;
 	}
 	printf("\n");
@@ -135,7 +118,7 @@ main(int argc, char const *argv[])
 
 	// Check to see if jobs need to be sliced.
 	printf("reallocSize=%d condition1Index=%d\n", reallocSize, condition1Index);
-	if (reallocSize == condition1Index+1)
+	if (reallocSize >= condition1Index+1)
 	{
 		printf("Have to slice the tasks as there is no frame size fitting the task set.\n");
 
@@ -186,21 +169,7 @@ main(int argc, char const *argv[])
 		}
 	}
 
-	printf("----------------------------\n");
-	printf("Task Info\n");
-	for (int i = 0; i < numLines; ++i)
-	{
-		printf("Task=%d, period=%d, wcet=%d, deadline=%d, numOfSplits=%d", i, tasks[i].period, tasks[i].wcet, tasks[i].deadline, tasks[i].numOfSplits);
-		if (tasks[i].numOfSplits != 0)
-		{
-			printf(", splits=");
-			for (int j = 0; j < tasks[i].numOfSplits + 1; ++j)
-			{
-				printf("%d ", tasks[i].splits[j]);
-			}
-		}
-		printf("\n");
-	}
+	// printTaskInfo(tasks, numLines);
 
 	int numJobs = 0;
 	// Calculating the number of total jobs.
@@ -211,23 +180,21 @@ main(int argc, char const *argv[])
 		else
 			numJobs += (hyperperiod / tasks[i].period) * (tasks[i].numOfSplits + 1);
 	}
+
 	// printf("numJobs=%d\n", numJobs);
+
 	// Creating numJobs of Task Instances.
 	TaskInstance *jobs = (TaskInstance *) malloc(sizeof(TaskInstance) * numJobs);
 	createTaskInstances(tasks, jobs, condition3Sizes[condition1Index], hyperperiod, numLines, numJobs);
 
-	printf("----------------------------\n");
-	printf("Job Info\n");
-	for (int i = 0; i < numJobs; ++i)
-	{
-		if (jobs[i].splitNum != -1)
-			printf("J%d,%d TaskInstance=%d: startFrame=%d, maxFrame=%d, wcet=%d\n", jobs[i].taskNum, jobs[i].splitNum, jobs[i].instanceNum, jobs[i].startFrame, jobs[i].maxFrame, jobs[i].wcet);
-		else
-			printf("J%d TaskInstance=%d: startFrame=%d, maxFrame=%d, wcet=%d\n", jobs[i].taskNum, jobs[i].instanceNum, jobs[i].startFrame, jobs[i].maxFrame, jobs[i].wcet);
-	}
+	printJobInfo(jobs, numJobs);
 
-	int frameSize = condition2Sizes[condition1Index+1];
-	calculateSchedule(jobs, numJobs, hyperperiod, frameSize);
+	int frameSize = condition3Sizes[condition1Index];
+	printf("frameSize=%d. Trying to create a schedule\n", frameSize);
+	Frame *frames = (Frame *) malloc(sizeof(Frame) * (hyperperiod / frameSize));
+	calculateSchedule(jobs, numJobs, frameSize, hyperperiod, frames);
+
+	// printFrameInfo(frames, hyperperiod / frameSize);
 
 
 
@@ -248,92 +215,6 @@ end:
 }
 
 
-/*
- * Finding hyperperiod is the same as LCM for in-phase jobs.
- * This method is essentially to find the LCM.
- */
-int
-findHyperPeriod(Task *tasks, int n)
-{
-	int ans = tasks[0].period;
-	for (int i = 1; i < n; i++) 
-        	ans = (((tasks[i].period * ans)) / (gcd(tasks[i].period, ans))); 
-       	return ans;
-}
-
-
-// Utility function to find GCD of 'a' and 'b'. 
-int
-gcd(int a, int b) 
-{
-	if (b == 0) 
-		return a;
-	return gcd(b, a % b); 
-}
-
-
-/*
- * Returns the minimum size of the frame according to condition-1.
- * Condition-1: Frame size should be greater than the maximum of the worst-case execution times of the task set.
- */
-int
-frameSizeCondition1(Task *tasks, int n)
-{
-	int maxSize = tasks[0].wcet;
-	for (int i = 1; i < n; i++)
-	{
-		if (maxSize < tasks[i].wcet)
-			maxSize = tasks[i].wcet;
-	}
-
-	return maxSize;
-}
-
-
-/*
- * Finds all the frame sizes possible based on condition-2.
- * Condition-2: [pi/f] - pi/f = 0 for at least one pi.
- */
-int
-frameSizeCondition2(int hyperperiod, int *answer)
-{
-	
-	int j = 0;
-	for (int i = 1; i <= hyperperiod; i++)
-	{
-		if (hyperperiod % i == 0)
-			answer[j++] = i;
-	}
-
-	return j;
-}
-
-
-/*
- * Finds all the frame sizes possible based on condition-2.
- * Condition-3: 2*f - gcd(pi,f) <= Di for all i for f to be a valid frame size.
- */
-int
-frameSizeCondition3(int *frames, Task *tasks, int numFrames, int numTasks, int *answers)
-{
-	int k = 0;
-	for (int i = 0; i < numFrames; ++i)
-	{
-		bool flag = true;
-		for (int j = 0; j < numTasks; ++j)
-		{
-			if (2*frames[i] - gcd(frames[i], tasks[j].period) > tasks[j].deadline)
-			{
-				flag = false;
-				break;
-			}
-		}
-		if (flag)
-			answers[k++] = frames[i];
-	}
-
-	return k;
-}
 
 
 /*
@@ -363,6 +244,7 @@ createTaskInstances(Task *tasks, TaskInstance *jobs, int frameSize, int hyperper
 					jobs[jobIndex].splitNum = k;
 					jobs[jobIndex].taskNum = i;
 					jobs[jobIndex].instanceNum = j / tasks[i].period;
+					jobs[jobIndex].alive = true;
 
 					jobIndex++;
 				}
@@ -375,10 +257,100 @@ createTaskInstances(Task *tasks, TaskInstance *jobs, int frameSize, int hyperper
 				jobs[jobIndex].splitNum = -1;
 				jobs[jobIndex].wcet = tasks[i].wcet;
 				jobs[jobIndex].instanceNum = j / tasks[i].period;
+				jobs[jobIndex].alive = true;
 				jobIndex++;
 			}
 		}
 	}
+
+	return;
+}
+
+
+
+/*
+ * Attempts to create a schedule using EDF algorithm.
+ * 
+ */
+void
+calculateSchedule(TaskInstance *jobs, int numJobs, int frameSize, int hyperperiod, Frame *frames)
+{
+	int numOfFrames = hyperperiod / frameSize;
+
+	int aliveCount = numJobs;
+	printf("initial aliveCount=%d\n", aliveCount);
+	printf("hyperperiod=%d, frameSize=%d, numOfFrames=%d\n", hyperperiod, frameSize, numOfFrames);
+	for (int f = 0; f < numOfFrames; ++f)
+	{
+		printf("Frame No=%d\nJobs=", f);
+		frames[f].numFrame = f;
+		frames[f].numJobs = 0;
+		frames[f].jobs = (TaskInstance **) malloc(sizeof(TaskInstance *) * aliveCount);
+
+		bool flag = true;
+		int minIndex;
+		int timeLeft = frameSize;
+		while(flag)
+		{
+			flag = false;
+			minIndex = 0;
+
+			for (int i = 0; i < numJobs; ++i) // For finding the first valid entry in the array.
+			{
+				if (!(jobs[i].alive && jobs[i].maxFrame > f && jobs[i].startFrame <= f && jobs[i].wcet <= timeLeft))
+					minIndex++;
+				else
+				{
+					flag = true;
+					break;
+				}
+			}
+			// printf("minIndex=%d\n", minIndex);
+			for (int i = minIndex+1; i < numJobs; ++i)
+			{
+				if (jobs[i].alive && jobs[i].startFrame <= f && jobs[i].maxFrame > f && jobs[i].maxFrame < jobs[minIndex].maxFrame && jobs[i].wcet <= timeLeft)
+				{
+					minIndex = i;
+				}
+				// else if(jobs[i].alive && jobs[i].startFrame <= f && jobs[i].maxFrame == jobs[minIndex].maxFrame && jobs[i].wcet <= timeLeft)
+				// 	if (jobs[i].wcet > jobs[minIndex].wcet)
+				// 	{
+				// 		minIndex = i;
+				// 		flag = true;
+				// 	}
+			}
+
+			if (!flag)
+				break;
+			// printf("minIndex=%d\n", minIndex);
+			printf("J%d,%d; ", jobs[minIndex].taskNum, jobs[minIndex].instanceNum);
+			frames[f].jobs[numJobs] = &jobs[minIndex];
+			frames[f].numJobs++;
+			jobs[minIndex].alive = false;
+			aliveCount--;
+			timeLeft -= jobs[minIndex].wcet;
+		}
+
+		printf("frames[f].numJobs=%d\n", frames[f].numJobs);
+		fflush(stdout);
+		frames[f].jobs = (TaskInstance **) realloc(frames[f].jobs, sizeof(TaskInstance *) * frames[f].numJobs);
+		// printf("numJobs in Frame-%d is: %d", f, frames[f].numJobs);
+		printf("\n\n");
+	}
+
+	printf("final aliveCount=%d\n", aliveCount);
+	if (aliveCount > 0)
+	{
+		printf("Could not schedule this set.\n");
+	}
+	else
+	{
+		printf("Schedule has been made!!\n");
+	}
+
+	// Resetting the jobs so that they can be scheduled again.
+	for (int i = 0; i < numJobs; i++)
+		jobs[i].alive = true;
 
 	return;
 }
