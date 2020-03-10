@@ -1,0 +1,55 @@
+Frame Size: 2
+Frame Number: 0
+	Slack after periodic jobs: 0.0
+	Number of periodic jobs scheduled: 2
+		Job: J0, Instance: 0, wcet: 1
+		Job: J1, Instance: 0, wcet: 1
+
+Frame Number: 1
+	Slack after periodic jobs: 0.0
+	Number of periodic jobs scheduled: 2
+		Job: J2, Instance: 0, wcet: 1
+		Job: J3, Split: 2, Instance: 0, wcet: 1
+
+Frame Number: 2
+	Slack after periodic jobs: 1.0
+	Number of periodic jobs scheduled: 1
+		Job: J0, Instance: 1, wcet: 1
+
+Frame Number: 3
+	Slack after periodic jobs: 1.0
+	Number of periodic jobs scheduled: 1
+		Job: J1, Instance: 1, wcet: 1
+
+Frame Number: 4
+	Slack after periodic jobs: 1.0
+	Number of periodic jobs scheduled: 1
+		Job: J0, Instance: 2, wcet: 1
+
+Frame Number: 5
+	Slack after periodic jobs: 0.0
+	Number of periodic jobs scheduled: 2
+		Job: J1, Instance: 2, wcet: 1
+		Job: J2, Instance: 1, wcet: 1
+
+Frame Number: 6
+	Slack after periodic jobs: 1.0
+	Number of periodic jobs scheduled: 1
+		Job: J0, Instance: 3, wcet: 1
+
+Frame Number: 7
+	Slack after periodic jobs: 0.0
+	Number of periodic jobs scheduled: 1
+		Job: J3, Split: 0, Instance: 0, wcet: 2
+
+Frame Number: 8
+	Slack after periodic jobs: 0.0
+	Number of periodic jobs scheduled: 2
+		Job: J0, Instance: 4, wcet: 1
+		Job: J1, Instance: 3, wcet: 1
+
+Frame Number: 9
+	Slack after periodic jobs: 0.0
+	Number of periodic jobs scheduled: 1
+		Job: J3, Split: 1, Instance: 0, wcet: 2
+

@@ -14,7 +14,7 @@ Given a set of periodic, aperiodic and sporadic jobs in an RTS, finding a feasib
 - [ ] Making the actual execution time as 20%-100% of wcet using pseudo random numbers.
 - [X] Modularise entire code base so that the driver function has at max 20 lines of code.
 - [ ] Make splitPeriodicTask in split.c return the frame size.
-- [ ] Store the frame data in outputfile - periodicSchedule.txt
+- [X] Store the frame data in outputfile - periodicSchedule.txt
 
 # Known bugs
 - [X] Malloc and realloc throw errors in calculateSchedule.c

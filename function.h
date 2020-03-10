@@ -15,3 +15,4 @@ void checkCpuUtilisation(Task*, int);
 void conditionChecker(Task *, int, int, int *, int *, int *, int *, int *);
 void splitTasks(int, int, int *, Task *, int);
 int findNumJobs(Task *, int, int);
+void storeFrameInfo(Frame *, int, int);

@@ -21,7 +21,7 @@ FILE
 	// Checking if there is an error.
 	if (!periodicJobFile)
 	{
-		fprintf(stderr, "Could not open file: %sProgram exiting.\n", periodicJobFileName);
+		fprintf(stderr, "Could not open file: %s\nProgram exiting.\n", periodicJobFileName);
 		exit(0);
 	}
 

@@ -10,6 +10,7 @@
  */
 
 #include <stdio.h>
+#include "driverMain.h"
 
 int
 main(int argc, char const *argv[])

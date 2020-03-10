@@ -80,16 +80,16 @@ periodTaskDriver(int argc, char *argv[])
 	printf("\n");
 	//
 
-	//
+	
 	// Splitting the periodic tasks if required.
 	splitTasks(reallocSize, condition1Index, condition3Sizes, tasks, numLines);
-	//
 
+	// To print information about tasks.
 	// printTaskInfo(tasks, numLines);
 
-	//
+	
 	int numJobs = findNumJobs(tasks, numLines, hyperperiod);
-	//
+	
 
 	// printf("numJobs=%d\n", numJobs);
 
@@ -98,7 +98,7 @@ periodTaskDriver(int argc, char *argv[])
 	createTaskInstances(tasks, jobs, condition3Sizes[condition1Index], hyperperiod, numLines, numJobs);
 
 	// To print information about jobs.
-	printJobInfo(jobs, numJobs);
+	// printJobInfo(jobs, numJobs);
 
 	// Creating and initialising frames.
 	int frameSize = condition3Sizes[condition1Index];
@@ -108,12 +108,10 @@ periodTaskDriver(int argc, char *argv[])
 	calculateSchedule(jobs, numJobs, frameSize, hyperperiod, frames);
 
 	// To print information about frames.
-	printFrameInfo(frames, hyperperiod / frameSize);
+	// printFrameInfo(frames, numFrames);
 
 	// To store the information about frames.
-	//
-	//
-	//
+	storeFrameInfo(frames, numFrames, frameSize);
 
 
 	// Freeing data.
