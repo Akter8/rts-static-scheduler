@@ -37,3 +37,20 @@ findHyperPeriod(Task *tasks, int n)
         	ans = (((tasks[i].period * ans)) / (gcd(tasks[i].period, ans))); 
        	return ans;
 }
+
+
+int
+findNumJobs(Task *tasks, int numLines, int hyperperiod)
+{
+	int numJobs = 0;
+	// Calculating the number of total jobs.
+	for (int i = 0; i < numLines; ++i)
+	{
+		if (tasks[i].numOfSplits == 0)
+			numJobs += hyperperiod / tasks[i].period;
+		else
+			numJobs += (hyperperiod / tasks[i].period) * (tasks[i].numOfSplits + 1);
+	}
+
+	return numJobs;
+}

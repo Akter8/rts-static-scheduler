@@ -12,4 +12,6 @@ void printFrameInfo(Frame *, int);
 FILE *firstCheck(int, char *[]);
 Task *periodicTaskInput(FILE *, int *);
 void checkCpuUtilisation(Task*, int);
-void conditionChecker(Task *, int, int);
+void conditionChecker(Task *, int, int, int *, int *, int *, int *, int *);
+void splitTasks(int, int, int *, Task *, int);
+int findNumJobs(Task *, int, int);

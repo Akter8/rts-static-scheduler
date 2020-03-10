@@ -46,9 +46,9 @@ checkCpuUtilisation(Task *tasks, int numLines)
 
 
 void
-conditionChecker(Task *tasks, int numLines, int hyperperiod)
+conditionChecker(Task *tasks, int numLines, int hyperperiod, int *c1, int *c2, int *c3, int *c1Index, int *reallocS)
 {
-		int condition1Size = frameSizeCondition1(tasks, numLines);
+	int condition1Size = frameSizeCondition1(tasks, numLines);
 	printf("Condition-1: %d\n", condition1Size);
 
 
@@ -86,4 +86,11 @@ conditionChecker(Task *tasks, int numLines, int hyperperiod)
 		printf("%d ", condition3Sizes[i]);
 	}
 	printf("\n");
+
+
+	*c1 = condition1Size;
+	*c1Index = condition1Index;
+	*reallocS = reallocSize;
+	c2 = condition2Sizes;
+	c3 = condition3Sizes;
 }

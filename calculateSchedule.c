@@ -72,6 +72,7 @@ calculateSchedule(TaskInstance *jobs, int numJobs, int frameSize, int hyperperio
 		// printf("numJobs=%d, jobsAlive=%d\n", frames[f].numJobs, aliveCount);
 		fflush(stdout);
 		frames[f].jobs = (TaskInstance *) realloc(frames[f].jobs, sizeof(TaskInstance) * frames[f].numJobs);
+		frames[f].slack = timeLeft;
 		// printf("numJobs in Frame-%d is: %d", f, frames[f].numJobs);
 		// printf("\n");
 	}

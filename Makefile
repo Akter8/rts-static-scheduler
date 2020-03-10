@@ -4,15 +4,18 @@ flags=-c -Wall
 
 executableName=test
 
-driver=test
+driver=driverMain
 
-all: Main
+all: PeriodicTask
 
-Main: $(driver).o printInfo.o checks.o frameConditions.o createTaskInstances.o calculateSchedule.o inputs.o
-	$(CC)  $(driver).o printInfo.o checks.o frameConditions.o createTaskInstances.o calculateSchedule.o inputs.o -o $(executableName)
+PeriodicTask: $(driver).o driverPeriodicTask.o printInfo.o checks.o frameConditions.o createTaskInstances.o calculateSchedule.o inputs.o split.o
+	$(CC)  $(driver).o driverPeriodicTask.o printInfo.o checks.o frameConditions.o createTaskInstances.o calculateSchedule.o inputs.o split.o -o $(executableName)
 
 $(driver).o: $(driver).c
 	$(CC) $(flags) $(driver).c
+
+driverPeriodicTask.o: driverPeriodicTask.c
+	$(CC) $(flags) driverPeriodicTask.c
 
 printInfo.o: printInfo.c
 	$(CC) $(flags) printInfo.c
@@ -31,6 +34,9 @@ checks.o: checks.c
 
 inputs.o: inputs.c
 	$(CC) $(flags) inputs.c
+
+split.o: split.c
+	$(CC) $(flags) split.c
 
 clean:
 	rm -f *.o $(executableName)
