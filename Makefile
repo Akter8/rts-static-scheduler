@@ -6,16 +6,19 @@ executableName=test
 
 driver=driverMain
 
-all: PeriodicTask
+#all: PeriodicTask
 
-PeriodicTask: $(driver).o driverPeriodicTask.o printInfo.o checks.o frameConditions.o createTaskInstances.o calculateSchedule.o inputs.o split.o
-	$(CC)  $(driver).o driverPeriodicTask.o printInfo.o checks.o frameConditions.o createTaskInstances.o calculateSchedule.o inputs.o split.o -o $(executableName)
+all: $(driver).o driverPeriodicTask.o printInfo.o checks.o frameConditions.o createTaskInstances.o calculateSchedule.o inputs.o split.o driverNonPeriodicJob.o
+	$(CC)  $(driver).o driverPeriodicTask.o printInfo.o checks.o frameConditions.o createTaskInstances.o calculateSchedule.o inputs.o split.o driverNonPeriodicJob.o -o $(executableName)
 
 $(driver).o: $(driver).c
 	$(CC) $(flags) $(driver).c
 
 driverPeriodicTask.o: driverPeriodicTask.c
 	$(CC) $(flags) driverPeriodicTask.c
+
+driverNonPeriodicJob.o: driverNonPeriodicJob.c
+	$(CC) $(flags) driverNonPeriodicJob.c
 
 printInfo.o: printInfo.c
 	$(CC) $(flags) printInfo.c

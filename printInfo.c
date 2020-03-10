@@ -86,6 +86,7 @@ storeFrameInfo(Frame *frames, int numFrames, int frameSize)
 	}
 
 	fprintf(outputFile, "Frame Size: %d\n", frameSize);
+	fprintf(outputFile, "Number of Frames: %d\n\n", numFrames);
 	for (int f = 0; f < numFrames; ++f) // Iterates through all the frames.
 	{
 		fprintf(outputFile, "Frame Number: %d\n", f);

@@ -1,4 +1,6 @@
 Frame Size: 2
+Number of Frames: 10
+
 Frame Number: 0
 	Slack after periodic jobs: 0.0
 	Number of periodic jobs scheduled: 2

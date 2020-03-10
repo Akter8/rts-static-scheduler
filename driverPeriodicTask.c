@@ -9,12 +9,7 @@
  *		frame sizes that fit this tast set.
  */
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include "struct.h"
-#include "function.h"
+#include "driverPeriodicTask.h"
 
 
 int
@@ -22,7 +17,8 @@ periodTaskDriver(int argc, char *argv[])
 {
 
 	// Doing basic checks on the inputs.
-	FILE *periodicJobFile = firstCheck(argc, argv);
+	firstCheck(argc, argv);
+	FILE *periodicJobFile = inputFileCheck(argv[1]);
 	
 
 	int numLines;

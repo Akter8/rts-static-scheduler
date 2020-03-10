@@ -4,8 +4,8 @@
 #include "struct.h"
 #include "function.h"
 
-FILE
-*firstCheck(int argc, char *argv[])
+void
+firstCheck(int argc, char *argv[])
 {
 	// Test to see if user has entered the file name or not.
 	if (argc != 2)
@@ -13,19 +13,22 @@ FILE
 		fprintf(stderr, "Please enter valid arguments. Program exiting.\n");
 		exit(0);
 	}
+}
 
-	char *periodicJobFileName = argv[1];
-	printf("The file entered is: %s\n", periodicJobFileName);
+FILE
+*inputFileCheck(char *fileName)
+{
+	printf("The file entered is: %s\n", fileName);
+	FILE *file = fopen(fileName, "r");
 
-	FILE *periodicJobFile = fopen(periodicJobFileName, "r");
 	// Checking if there is an error.
-	if (!periodicJobFile)
+	if (!file)
 	{
-		fprintf(stderr, "Could not open file: %s\nProgram exiting.\n", periodicJobFileName);
+		fprintf(stderr, "Could not open file: %s\nProgram exiting.\n", fileName);
 		exit(0);
 	}
 
-	return periodicJobFile;
+	return file;
 }
 
 

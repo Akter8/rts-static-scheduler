@@ -16,11 +16,16 @@ Given a set of periodic, aperiodic and sporadic jobs in an RTS, finding a feasib
 - [ ] Make splitPeriodicTask in split.c return the frame size.
 - [X] Store the frame data in outputfile - periodicSchedule.txt
 
+# Assumptions
+1. None of the jobs- periodic or non-periodic overrun.
+
 # Known bugs
 - [X] Malloc and realloc throw errors in calculateSchedule.c
 
 # How to compile
-Run "make" to compile and "make clean" to clean the compilation.
+On the CLI run "make" to compile and "make clean" to clean the compilation.
 
 # Inputs required
-periodicTasks.txt: First line should have the number of tasks in the task set. Subsequent lines should have 3 integers- period, wcet and deadline respectively.
+1. periodicTasks.txt: First line should have the number of tasks in the task set. Subsequent lines should have 3 integers- period, wcet and deadline respectively.
+2. aperiodicJobs.txt:
+3. sporadicJobs.txt:

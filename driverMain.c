@@ -17,7 +17,7 @@ main(int argc, char const *argv[])
 {
 	periodTaskDriver(argc, argv);
 
-	// nonPeriodicTaskDriver();
+	nonPeriodicJobDriver();
 
 	return 0;
 }
