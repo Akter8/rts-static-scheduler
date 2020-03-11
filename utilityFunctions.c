@@ -39,12 +39,16 @@ findHyperPeriod(Task *tasks, int n)
 }
 
 
+/*
+ * Finds the total number of task-instances that are to be created
+ * in the case of periodic tasks.
+ */
 int
-findNumJobs(Task *tasks, int numLines, int hyperperiod)
+findNumJobs(Task *tasks, int numTasks, int hyperperiod)
 {
 	int numJobs = 0;
 	// Calculating the number of total jobs.
-	for (int i = 0; i < numLines; ++i)
+	for (int i = 0; i < numTasks; ++i)
 	{
 		if (tasks[i].numOfSplits == 0)
 			numJobs += hyperperiod / tasks[i].period;

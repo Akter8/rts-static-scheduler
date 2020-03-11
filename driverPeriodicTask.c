@@ -21,23 +21,29 @@ periodTaskDriver(int argc, char *argv[])
 	FILE *periodicJobFile = inputFileCheck(argv[1]);
 	
 
-	int numLines;
+	int numTasks;
 	// Taking in input for periodic tasks.
-	Task *tasks = periodicTaskInput(periodicJobFile, &numLines);
+	Task *tasks = periodicTaskInput(periodicJobFile, &numTasks);
+
+	// Sorting the inputs based on their period.
+	sortTasks(tasks, 0, numTasks - 1);
+
+	// To print information about tasks.
+	printTaskInfo(tasks, numTasks);
 
 	// Checking the CPU utilisation.
-	checkCpuUtilisation(tasks, numLines);
+	checkCpuUtilisation(tasks, numTasks);
 
 	// Finding the hyperperiod.
-	int hyperperiod = findHyperPeriod(tasks, numLines);
+	int hyperperiod = findHyperPeriod(tasks, numTasks);
 
 	
 	// int condition1Size, *condition2Sizes, *condition3Sizes, condition1Index, reallocSize;
-	// conditionChecker(tasks, numLines, hyperperiod, &condition1Size, condition2Sizes, condition3Sizes, &condition1Index, &reallocSize);
+	// conditionChecker(tasks, numTasks, hyperperiod, &condition1Size, condition2Sizes, condition3Sizes, &condition1Index, &reallocSize);
 	
 	//
 	printf("\n");
-	int condition1Size = frameSizeCondition1(tasks, numLines);
+	int condition1Size = frameSizeCondition1(tasks, numTasks);
 	printf("Condition-1: %d\n", condition1Size);
 
 
@@ -56,7 +62,7 @@ periodTaskDriver(int argc, char *argv[])
 
 
 	int *condition3Sizes = (int *) malloc(sizeof(int) * reallocSize);
-	reallocSize = frameSizeCondition3(condition2Sizes, tasks, reallocSize, numLines, condition3Sizes);
+	reallocSize = frameSizeCondition3(condition2Sizes, tasks, reallocSize, numTasks, condition3Sizes);
 	condition3Sizes = realloc(condition3Sizes, sizeof(int) * reallocSize);
 	int condition1Index2 = -1;
 	printf("Condition-3: ");
@@ -78,20 +84,20 @@ periodTaskDriver(int argc, char *argv[])
 
 	
 	// Splitting the periodic tasks if required.
-	splitTasks(reallocSize, condition1Index, condition3Sizes, tasks, numLines);
+	splitTasks(reallocSize, condition1Index, condition3Sizes, tasks, numTasks);
 
 	// To print information about tasks.
-	// printTaskInfo(tasks, numLines);
+	// printTaskInfo(tasks, numTasks);
 
 	
-	int numJobs = findNumJobs(tasks, numLines, hyperperiod);
+	int numJobs = findNumJobs(tasks, numTasks, hyperperiod);
 	
 
 	// printf("numJobs=%d\n", numJobs);
 
 	// Creating and initialising task instances.
 	TaskInstance *jobs = (TaskInstance *) malloc(sizeof(TaskInstance) * numJobs);
-	createTaskInstances(tasks, jobs, condition3Sizes[condition1Index], hyperperiod, numLines, numJobs);
+	createTaskInstances(tasks, jobs, condition3Sizes[condition1Index], hyperperiod, numTasks, numJobs);
 
 	// To print information about jobs.
 	// printJobInfo(jobs, numJobs);
@@ -120,7 +126,7 @@ periodTaskDriver(int argc, char *argv[])
 	}
 	free(frames);
 
-	for (int i = 0; i < numLines; ++i)
+	for (int i = 0; i < numTasks; ++i)
 	{
 		free(tasks[i].splits);
 	}

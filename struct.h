@@ -1,5 +1,6 @@
 typedef struct
 {
+	int taskNum;
 	int period;
 	int deadline;
 	int wcet;

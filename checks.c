@@ -4,6 +4,11 @@
 #include "struct.h"
 #include "function.h"
 
+
+/*
+ * Checks to see if the number of arguments given to the main driver
+ * is equal to two. If not, it exits the program.
+ */
 void
 firstCheck(int argc, char *argv[])
 {
@@ -15,6 +20,11 @@ firstCheck(int argc, char *argv[])
 	}
 }
 
+
+/*
+ * Tries to open any files given to it.
+ * Returns the file if it opened it successfully, else exits.
+ */
 FILE
 *inputFileCheck(char *fileName)
 {
@@ -32,10 +42,14 @@ FILE
 }
 
 
+/*
+ * Finds the total CPU utilisation of the periodic tasks, if > 1
+ * it exits the program.
+ */
 void
-checkCpuUtilisation(Task *tasks, int numLines)
+checkCpuUtilisation(Task *tasks, int numTasks)
 {
-	float cpuUtilisation = calculateCpuUtilisation(tasks, numLines);
+	float cpuUtilisation = calculateCpuUtilisation(tasks, numTasks);
 	if (cpuUtilisation < 1.0f)
 	{
 		printf("CPU Utilisation < 1: might be schedulable.\n");
@@ -49,9 +63,9 @@ checkCpuUtilisation(Task *tasks, int numLines)
 
 
 void
-conditionChecker(Task *tasks, int numLines, int hyperperiod, int *c1, int *c2, int *c3, int *c1Index, int *reallocS)
+conditionChecker(Task *tasks, int numTasks, int hyperperiod, int *c1, int *c2, int *c3, int *c1Index, int *reallocS)
 {
-	int condition1Size = frameSizeCondition1(tasks, numLines);
+	int condition1Size = frameSizeCondition1(tasks, numTasks);
 	printf("Condition-1: %d\n", condition1Size);
 
 
@@ -70,7 +84,7 @@ conditionChecker(Task *tasks, int numLines, int hyperperiod, int *c1, int *c2, i
 
 
 	int *condition3Sizes = (int *) malloc(sizeof(int) * reallocSize);
-	reallocSize = frameSizeCondition3(condition2Sizes, tasks, reallocSize, numLines, condition3Sizes);
+	reallocSize = frameSizeCondition3(condition2Sizes, tasks, reallocSize, numTasks, condition3Sizes);
 	condition3Sizes = realloc(condition3Sizes, sizeof(int) * reallocSize);
 	int condition1Index2 = -1;
 	printf("Condition-3: ");

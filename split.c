@@ -5,7 +5,7 @@
 
 
 int
-splitTasks(int reallocSize, int condition1Index, int *condition3Sizes, Task *tasks, int numLines)
+splitTasks(int reallocSize, int condition1Index, int *condition3Sizes, Task *tasks, int numTasks)
 {
 	printf("reallocSize=%d condition1Index=%d\n", reallocSize, condition1Index);
 	if (reallocSize >= condition1Index+1)
@@ -16,7 +16,7 @@ splitTasks(int reallocSize, int condition1Index, int *condition3Sizes, Task *tas
 		int *indicesOfJobsToSlice = (int *) malloc(sizeof(int) * reallocSize + 1);
 
 		// Finding the number of jobs that need to be sliced at min.
-		for (int i = 0; i < numLines; ++i)
+		for (int i = 0; i < numTasks; ++i)
 		{
 			if(tasks[i].wcet > condition3Sizes[condition1Index])
 			{

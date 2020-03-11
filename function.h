@@ -17,3 +17,5 @@ void conditionChecker(Task *, int, int, int *, int *, int *, int *, int *);
 void splitTasks(int, int, int *, Task *, int);
 int findNumJobs(Task *, int, int);
 void storeFrameInfo(Frame *, int, int);
+void sortTasks(Task *, int, int);
+void mergeTasks(Task *, int, int, int);

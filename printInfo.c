@@ -14,15 +14,16 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include "struct.h"
+#include "structNonPeriodic.h"
 
 void
-printTaskInfo(Task *tasks, int numLines)
+printTaskInfo(Task *tasks, int numTasks)
 {
 	printf("----------------------------\n");
 	printf("Task Info\n");
-	for (int i = 0; i < numLines; ++i)
+	for (int i = 0; i < numTasks; ++i)
 	{
-		printf("Task=%d, period=%d, wcet=%d, deadline=%d, numOfSplits=%d", i, tasks[i].period, tasks[i].wcet, tasks[i].deadline, tasks[i].numOfSplits);
+		printf("Task=T%d, period=%d, wcet=%d, deadline=%d, numOfSplits=%d", tasks[i].taskNum, tasks[i].period, tasks[i].wcet, tasks[i].deadline, tasks[i].numOfSplits);
 		if (tasks[i].numOfSplits != 0)
 		{
 			printf(", splits=");
@@ -85,7 +86,7 @@ storeFrameInfo(Frame *frames, int numFrames, int frameSize)
 		exit(0);
 	}
 
-	fprintf(outputFile, "Frame Size: %d\n", frameSize);
+	/*fprintf(outputFile, "Frame Size: %d\n", frameSize);
 	fprintf(outputFile, "Number of Frames: %d\n\n", numFrames);
 	for (int f = 0; f < numFrames; ++f) // Iterates through all the frames.
 	{
@@ -100,7 +101,53 @@ storeFrameInfo(Frame *frames, int numFrames, int frameSize)
 				fprintf(outputFile, "\t\tJob: J%d, Instance: %d, wcet: %d\n", frames[f].jobs[i].taskNum, frames[f].jobs[i].instanceNum, frames[f].jobs[i].wcet);
 		}
 		fprintf(outputFile, "\n");		
+	}*/
+
+	fprintf(outputFile, "%d\n", frameSize);
+	fprintf(outputFile, "%d\n\n", numFrames);
+	for (int f = 0; f < numFrames; ++f) // Iterates through all the frames.
+	{
+		// fprintf(outputFile, "%d\n", f);
+		fprintf(outputFile, "%0.1f\n", frames[f].slack);
+		fprintf(outputFile, "%d\n", frames[f].numJobs);
+		for (int i = 0; i < frames[f].numJobs; ++i)
+		{
+			if (frames[f].jobs[i].splitNum != -1) // If the task has been split.
+				fprintf(outputFile, "Y %d %d %d %d\n", frames[f].jobs[i].taskNum, frames[f].jobs[i].splitNum, frames[f].jobs[i].instanceNum, frames[f].jobs[i].wcet);
+			else
+				fprintf(outputFile, "N %d %d %d\n", frames[f].jobs[i].taskNum, frames[f].jobs[i].instanceNum, frames[f].jobs[i].wcet);
+		}
+		fprintf(outputFile, "\n");		
 	}
 
+	fclose(outputFile);
+
 	return;
+}
+
+
+void
+printAperiodicJobInfo(AperiodicJob *aperiodicJobs, int numJobs)
+{
+	printf("----------------------------\n");
+	printf("Aperiodic Job Info\n");
+
+	for (int i = 0; i < numJobs; ++i)
+	{
+		printf("Job=A%d, ArrivalTime=%0.1f, ExecutionTime=%0.1f\n", aperiodicJobs[i].jobNum, aperiodicJobs[i].arrivalTime, aperiodicJobs[i].wcet);
+	}
+}
+
+
+
+void
+printSporadicJobInfo(SporadicJob *sporadicJobs, int numJobs)
+{
+	printf("----------------------------\n");
+	printf("Sporadic Job Info\n");
+
+	for (int i = 0; i < numJobs; ++i)
+	{
+		printf("Job=S%d, ArrivalTime=%0.1f, ExecutionTime=%0.1f, Deadline=%0.1f\n", sporadicJobs[i].jobNum, sporadicJobs[i].arrivalTime, sporadicJobs[i].wcet, sporadicJobs[i].deadline);
+	}
 }

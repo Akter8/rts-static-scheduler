@@ -3,3 +3,15 @@
 5	1	5
 10	1	10
 20	5	20
+
+-----------------------------------------------------
+How to write input:
+First line: 			# of tasks
+Subsequent lines:		period \t wcet \t deadline
+
+Sample input:
+4
+4	1	4
+5	1	5
+10	1	10
+20	5	20
