@@ -100,7 +100,7 @@ periodTaskDriver(int argc, char *argv[])
 	createTaskInstances(tasks, jobs, condition3Sizes[condition1Index], hyperperiod, numTasks, numJobs);
 
 	// To print information about jobs.
-	// printJobInfo(jobs, numJobs);
+	printJobInfo(jobs, numJobs);
 
 	// Creating and initialising frames.
 	int frameSize = condition3Sizes[condition1Index];
@@ -110,7 +110,7 @@ periodTaskDriver(int argc, char *argv[])
 	calculateSchedule(jobs, numJobs, frameSize, hyperperiod, frames);
 
 	// To print information about frames.
-	// printFrameInfo(frames, numFrames);
+	printFrameInfo(frames, numFrames);
 
 	// To store the information about frames.
 	storeFrameInfo(frames, numFrames, frameSize);

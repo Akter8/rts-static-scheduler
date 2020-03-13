@@ -50,9 +50,9 @@ void
 checkCpuUtilisation(Task *tasks, int numTasks)
 {
 	float cpuUtilisation = calculateCpuUtilisation(tasks, numTasks);
-	if (cpuUtilisation < 1.0f)
+	if (cpuUtilisation <= 1.0f)
 	{
-		printf("CPU Utilisation < 1: might be schedulable.\n");
+		printf("CPU Utilisation <= 1: might be schedulable.\n");
 	}
 	else
 	{

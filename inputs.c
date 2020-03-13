@@ -74,6 +74,8 @@ AperiodicJob
 
 		// Need to store this now as they will be sorted based on arrival time.
 		aperiodicJobs[i].jobNum = i;
+		aperiodicJobs[i].timeLeft = aperiodicJobs[i].wcet;
+		aperiodicJobs[i].alive = true;
 	}
 
 	fclose(aperiodicJobsFile);
@@ -108,7 +110,13 @@ SporadicJob
 		if (sporadicJobs[i].wcet > sporadicJobs[i].deadline)
 		{
 			fprintf(stderr, "Please enter valid data into sporadicJobs.txt\n");
+			exit(0);
 		}
+
+		sporadicJobs[i].timeLeft = sporadicJobs[i].wcet;
+		sporadicJobs[i].alive = true;
+		sporadicJobs[i].accepted = false;
+		sporadicJobs[i].rejected = false;
 	}
 
 	fclose(sporadicJobsFile);
@@ -138,6 +146,10 @@ ScheduleFrame
 		fscanf(framesFile, "%f %d\n", &framesData[i].slack, &framesData[i].numPeriodicJobs);
 		framesData[i].periodicJobs = (PeriodicJob *) malloc(sizeof(PeriodicJob) * framesData[i].numPeriodicJobs);
 
+		// Initialising the frames.
+		framesData[i].numSporadicJobs = 0;
+		framesData[i].sporadicJobs = (SporadicJob *) malloc(sizeof(SporadicJob) * 0);
+
 		for (int j = 0; j < framesData[i].numPeriodicJobs; ++j)
 		{
 			char test;
@@ -147,6 +159,7 @@ ScheduleFrame
 			if (test == 'N')
 			{
 				fscanf(framesFile, "%d %d %f", &framesData[i].periodicJobs[j].taskNum, &framesData[i].periodicJobs[j].instanceNum, &framesData[i].periodicJobs[j].wcet);
+				framesData[i].periodicJobs[j].splitNum = -1;
 
 				// printf("%d %d %f\n", framesData[i].periodicJobs[j].taskNum, framesData[i].periodicJobs[j].instanceNum, framesData[i].periodicJobs[j].wcet);
 				// fflush(stdout);	
@@ -157,6 +170,8 @@ ScheduleFrame
 				// printf("%d %d %d %f\n", framesData[i].periodicJobs[j].taskNum, framesData[i].periodicJobs[j].splitNum, framesData[i].periodicJobs[j].instanceNum, framesData[i].periodicJobs[j].wcet);
 				// fflush(stdout);	
 			}
+
+			framesData[i].periodicJobs[j].alive = true;
 		}
 		
 	}

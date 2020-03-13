@@ -2,7 +2,7 @@
 Given a set of periodic, aperiodic and sporadic jobs in an RTS, finding a feasible schedule for the task set with valid frame sizes
 
 
-# Tasks to be done
+### Tasks to be done
 - [X] Find CPU utilisation and hyperperiod.
 - [X] Create a Makefile.
 - [X] Create basic schedule creator.
@@ -14,22 +14,28 @@ Given a set of periodic, aperiodic and sporadic jobs in an RTS, finding a feasib
 - [ ] Combine the task of slicing and selecting jobs for a frame.
 - [ ] Convert all data types into float.
 - [X] Taking input from aperiodic, sporadic and frames files.
-- [ ] Adding the aperiodic and sporadic jobs part.
-- [ ] Making the actual execution time as 20%-100% of wcet using pseudo random numbers.
+- [X] Making the actual execution time as 20%-100% of wcet using pseudo random numbers.
 - [X] Modularise entire code base so that the driver function has at max 20 lines of code.
 - [X] Store the frame data in outputfile - periodicSchedule.txt
 - [X] Convert numLines into numTasks.
+- [X] Create the scheduler with a timer.
+- [X] Schedule aperiodic jobs.
+- [X] Schedule periodic jobs.
+- [X] Schedule sporadic jobs.
+- [X] Make the scheduler such that if it finished the sporadic and periodic tasks for that job, then it should look ahead into the future frames and get sporadic jobs from there, so that when newer sporadic jobs arrive in the future, then theres a better chance that they will get accepted.
+- [ ] Finish the check-2 while accepting a new job in findSporadicJobsInFrame() in scheduler.c
+- [X] Finish the sorting of sporadic jobs based on EDF in scheduler.c
 
-# Assumptions
+### Assumptions
 1. None of the jobs- periodic or non-periodic overrun.
 
-# Known bugs
+### Known bugs
 - [X] Malloc and realloc throw errors in calculateSchedule.c
 
-# How to compile
+### How to compile
 On the CLI run "make" to compile and "make clean" to clean the compilation.
 
-# Inputs required
+## Inputs required
 1. periodicTasks.txt: First line should have the number of tasks in the task set. Subsequent lines should have 3 integers- period, wcet and relative deadline respectively.
 2. aperiodicJobs.txt: First line should have the number of tasks in the task set. Subsequent lines should have 2 integers- arrival time and execution time respectively.
 3. sporadicJobs.txt: First line should have the number of tasks in the task set. Subsequent lines should have 3 integers- arrival time, execution time and absolute deadline respectively.

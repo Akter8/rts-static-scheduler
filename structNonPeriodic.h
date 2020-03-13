@@ -14,6 +14,7 @@ typedef struct
 	float arrivalTime;
 	float wcet;
 	bool alive;
+	float timeLeft;
 }
 AperiodicJob;
 
@@ -30,6 +31,9 @@ typedef struct
 	int startFrame;
 	int maxFrame;
 	bool alive;
+	bool accepted;
+	bool rejected;
+	float timeLeft;
 }
 SporadicJob;
 

@@ -21,6 +21,7 @@ printTaskInfo(Task *tasks, int numTasks)
 {
 	printf("----------------------------\n");
 	printf("Task Info\n");
+	printf("Num Tasks: %d\n", numTasks);
 	for (int i = 0; i < numTasks; ++i)
 	{
 		printf("Task=T%d, period=%d, wcet=%d, deadline=%d, numOfSplits=%d", tasks[i].taskNum, tasks[i].period, tasks[i].wcet, tasks[i].deadline, tasks[i].numOfSplits);
@@ -42,6 +43,7 @@ printJobInfo(TaskInstance * jobs, int numJobs)
 {
 	printf("----------------------------\n");
 	printf("Job Info\n");
+	printf("Num Jobs: %d\n", numJobs);
 	for (int i = 0; i < numJobs; ++i)
 	{
 		if (jobs[i].splitNum != -1)
@@ -57,6 +59,7 @@ printFrameInfo(Frame * frames, int numFrames)
 {
 	printf("----------------------------\n");
 	printf("Frame Info\n");
+	printf("Num Frames: %d\n", numFrames);
 	for (int f = 0; f < numFrames; ++f)
 	{
 		printf("Frame no.%d, Jobs=\n", f);
@@ -85,23 +88,6 @@ storeFrameInfo(Frame *frames, int numFrames, int frameSize)
 		fprintf(stderr, "The outputFile- periodicSchedule.txt did not open properly.\n");
 		exit(0);
 	}
-
-	/*fprintf(outputFile, "Frame Size: %d\n", frameSize);
-	fprintf(outputFile, "Number of Frames: %d\n\n", numFrames);
-	for (int f = 0; f < numFrames; ++f) // Iterates through all the frames.
-	{
-		fprintf(outputFile, "Frame Number: %d\n", f);
-		fprintf(outputFile, "\tSlack after periodic jobs: %0.1f\n", frames[f].slack);
-		fprintf(outputFile, "\tNumber of periodic jobs scheduled: %d\n", frames[f].numJobs);
-		for (int i = 0; i < frames[f].numJobs; ++i)
-		{
-			if (frames[f].jobs[i].splitNum != -1)
-				fprintf(outputFile, "\t\tJob: J%d, Split: %d, Instance: %d, wcet: %d\n", frames[f].jobs[i].taskNum, frames[f].jobs[i].splitNum, frames[f].jobs[i].instanceNum, frames[f].jobs[i].wcet);
-			else
-				fprintf(outputFile, "\t\tJob: J%d, Instance: %d, wcet: %d\n", frames[f].jobs[i].taskNum, frames[f].jobs[i].instanceNum, frames[f].jobs[i].wcet);
-		}
-		fprintf(outputFile, "\n");		
-	}*/
 
 	fprintf(outputFile, "%d\n", frameSize);
 	fprintf(outputFile, "%d\n\n", numFrames);
@@ -148,6 +134,30 @@ printSporadicJobInfo(SporadicJob *sporadicJobs, int numJobs)
 
 	for (int i = 0; i < numJobs; ++i)
 	{
-		printf("Job=S%d, ArrivalTime=%0.1f, ExecutionTime=%0.1f, Deadline=%0.1f\n", sporadicJobs[i].jobNum, sporadicJobs[i].arrivalTime, sporadicJobs[i].wcet, sporadicJobs[i].deadline);
+		printf("Job=S%d, ArrivalTime=%0.1f, ExecutionTime=%0.1f, Deadline=%0.1f, startFrame=%d, maxFrame=%d\n", sporadicJobs[i].jobNum, sporadicJobs[i].arrivalTime, sporadicJobs[i].wcet, sporadicJobs[i].deadline, sporadicJobs[i].startFrame, sporadicJobs[i].maxFrame);
+	}
+}
+
+
+void
+printScheduleFrameInfo(ScheduleFrame *framesData, int numFrames)
+{
+	printf("----------------------------\n");
+	printf("Schedule Frame Info\n");
+
+	for (int f = 0; f < numFrames; ++f)
+	{
+		printf("Frame no: %d\n", f);
+		printf("Slack: %0.1f\n", framesData[f].slack);
+		printf("No of periodic jobs: %d\n", framesData[f].numPeriodicJobs);
+		for (int i = 0; i < framesData[f].numPeriodicJobs; ++i)
+		{
+			if (framesData[f].periodicJobs[i].splitNum != -1)
+				printf("J%d,%d: Instance: %d, wcet: %0.1f\n", framesData[f].periodicJobs[i].taskNum, framesData[f].periodicJobs[i].splitNum, framesData[f].periodicJobs[i].instanceNum, framesData[f].periodicJobs[i].wcet);
+			else
+				printf("J%d: Instance: %d, wcet: %0.1f\n", framesData[f].periodicJobs[i].taskNum, framesData[f].periodicJobs[i].instanceNum, framesData[f].periodicJobs[i].wcet);
+		}
+
+		printf("\n");
 	}
 }

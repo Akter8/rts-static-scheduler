@@ -37,10 +37,6 @@ nonPeriodicJobDriver()
 	sortAperiodicJobs(aperiodicJobs, 0, numAperiodicJobs - 1);
 	sortSporadicJobs(sporadicJobs, 0, numSporadicJobs - 1);
 
-	// Print the data for debugging.
-	printAperiodicJobInfo(aperiodicJobs, numAperiodicJobs);
-	printSporadicJobInfo(sporadicJobs, numSporadicJobs);
-
 
 	// Calculate the frames in which the sporadic jobs will arrive.
 	// findSporadicFrames(sporadicJobs, numSporadicJobs, frameSize);
@@ -49,13 +45,24 @@ nonPeriodicJobDriver()
 		// [startFrame, maxFrame);
 		// [.] => can use that frame as well.
 		// (.) => cannot use that frame.
-		sporadicJobs[i].startFrame = sporadicJobs[i].arrivalTime / frameSize;
+		sporadicJobs[i].startFrame = sporadicJobs[i].arrivalTime / frameSize + 1;
 		sporadicJobs[i].maxFrame = sporadicJobs[i].deadline / frameSize;
 	}
 
 
+	// Print the data for debugging.
+	printAperiodicJobInfo(aperiodicJobs, numAperiodicJobs);
+	printSporadicJobInfo(sporadicJobs, numSporadicJobs);
+	printScheduleFrameInfo(framesData, numFrames);
+
+
 	// Start the scheduler.
-	
+	scheduler(framesData, numFrames, frameSize, aperiodicJobs, numAperiodicJobs, sporadicJobs, numSporadicJobs);
+	//
+	//
+	// Finish the scheduler.
+	//
+	//
 
 
 
