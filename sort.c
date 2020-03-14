@@ -9,9 +9,9 @@
  *	
  */
 
-
-#include "structNonPeriodic.h"
-#include "struct.h"
+#include <stdio.h>
+#include "functionNonPeriodic.h"
+#include "function.h"
 
 
 /*

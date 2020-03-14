@@ -13,7 +13,7 @@
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "structNonPeriodic.h"
+#include "functionNonPeriodic.h"
 
 
 bool

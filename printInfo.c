@@ -13,8 +13,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include "struct.h"
-#include "structNonPeriodic.h"
+#include "function.h"
+#include "functionNonPeriodic.h"
 
 void
 printTaskInfo(Task *tasks, int numTasks)

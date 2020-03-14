@@ -1,5 +1,6 @@
+#include <stdio.h>
 #include <stdbool.h>
-#include "struct.h"
+#include "function.h"
 
 /*
  * Fills in the details of the array of various instances of the tasks based on the task details.

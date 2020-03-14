@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include "struct.h"
+#include "function.h"
 
 /*
  * Attempts to create a schedule using EDF algorithm.

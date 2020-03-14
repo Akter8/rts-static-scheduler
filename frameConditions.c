@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
-#include "struct.h"
-#include "utilityFunctions.c"
+#include "function.h"
 
 /*
  * Returns the minimum size of the frame according to condition-1.

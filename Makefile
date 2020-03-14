@@ -8,8 +8,8 @@ driver=driverMain
 
 #all: PeriodicTask
 
-all: $(driver).o driverPeriodicTask.o printInfo.o checks.o frameConditions.o createTaskInstances.o calculateSchedule.o inputs.o split.o driverNonPeriodicJob.o sort.o scheduler.o
-	$(CC)  $(driver).o driverPeriodicTask.o printInfo.o checks.o frameConditions.o createTaskInstances.o calculateSchedule.o inputs.o split.o driverNonPeriodicJob.o sort.o scheduler.o -o $(executableName)
+all: $(driver).o driverPeriodicTask.o printInfo.o checks.o frameConditions.o createTaskInstances.o calculateSchedule.o inputs.o split.o driverNonPeriodicJob.o sort.o scheduler.o utilityFunctions.o
+	$(CC)  $(driver).o driverPeriodicTask.o printInfo.o checks.o frameConditions.o createTaskInstances.o calculateSchedule.o inputs.o split.o driverNonPeriodicJob.o sort.o scheduler.o utilityFunctions.o -o $(executableName)
 
 $(driver).o: $(driver).c
 	$(CC) $(flags) $(driver).c
@@ -46,6 +46,9 @@ inputs.o: inputs.c
 
 split.o: split.c
 	$(CC) $(flags) split.c
+
+utilityFunctions.o: utilityFunctions.c
+	$(CC) $(flags) utilityFunctions.c
 
 clean:
 	rm -f *.o $(executableName)

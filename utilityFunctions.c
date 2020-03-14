@@ -1,3 +1,6 @@
+#include "function.h"
+#include "functionNonPeriodic.h"
+
 // Utility function to find GCD of 'a' and 'b'. 
 int
 gcd(int a, int b) 
