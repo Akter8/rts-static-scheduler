@@ -19,6 +19,8 @@ periodTaskDriver(int argc, char *argv[])
 	// Doing basic checks on the inputs.
 	firstCheck(argc, argv);
 	FILE *periodicJobFile = inputFileCheck(argv[1]);
+
+	FILE *outputFile = fopen(OUTPUT_FILE, "a");
 	
 
 	int numTasks;
@@ -31,55 +33,62 @@ periodTaskDriver(int argc, char *argv[])
 	// To print information about tasks.
 	printTaskInfo(tasks, numTasks);
 
+
+	fprintf(outputFile, "----------------------------\n");
+	fflush(outputFile);
 	// Checking the CPU utilisation.
 	checkCpuUtilisation(tasks, numTasks);
 
 	// Finding the hyperperiod.
 	int hyperperiod = findHyperPeriod(tasks, numTasks);
-
+	fprintf(outputFile, "Hyperperiod = %d\n", hyperperiod);
+	fflush(outputFile);
 	
 	// int condition1Size, *condition2Sizes, *condition3Sizes, condition1Index, reallocSize;
 	// conditionChecker(tasks, numTasks, hyperperiod, &condition1Size, condition2Sizes, condition3Sizes, &condition1Index, &reallocSize);
 	
 	//
-	printf("\n");
+	fprintf(outputFile, "\n");
 	int condition1Size = frameSizeCondition1(tasks, numTasks);
-	printf("Condition-1: %d\n", condition1Size);
+	fprintf(outputFile, "Condition-1: %d\n", condition1Size);
+	fflush(outputFile);
 
 
 	int *condition2Sizes = (int *) malloc(sizeof(int) * hyperperiod);
 	int reallocSize = frameSizeCondition2(hyperperiod, condition2Sizes);
 	condition2Sizes = realloc(condition2Sizes, sizeof(int) * reallocSize);
-	printf("Condition-2: ");
+	fprintf(outputFile, "Condition-2: ");
 	int condition1Index1 = -1;
 	for (int i = 0; i < reallocSize; ++i)
 	{
-		printf("%d ", condition2Sizes[i]);
+		fprintf(outputFile, "%d ", condition2Sizes[i]);
 		if(condition2Sizes[i] <= condition1Size)
 			condition1Index1++;
 	}
-	printf("\n");
+	fprintf(outputFile, "\n");
+	fflush(outputFile);
 
 
 	int *condition3Sizes = (int *) malloc(sizeof(int) * reallocSize);
 	reallocSize = frameSizeCondition3(condition2Sizes, tasks, reallocSize, numTasks, condition3Sizes);
 	condition3Sizes = realloc(condition3Sizes, sizeof(int) * reallocSize);
 	int condition1Index2 = -1;
-	printf("Condition-3: ");
+	fprintf(outputFile, "Condition-3: ");
 	for (int i = 0; i < reallocSize; ++i)
 	{
-		printf("%d ", condition3Sizes[i]);
+		fprintf(outputFile, "%d ", condition3Sizes[i]);
 		if(condition3Sizes[i] <= condition1Size)
 			condition1Index2++;
 	}
 
 	int condition1Index = condition1Index1 < condition1Index2 ? condition1Index1 : condition1Index2;
-	printf("Possible frame size(s) based on the three conditions: ");
+	fprintf(outputFile, "Possible frame size(s) based on the three conditions: ");
 	for (int i = condition1Index+1; i < reallocSize; ++i)
 	{
-		printf("%d ", condition3Sizes[i]);
+		fprintf(outputFile, "%d ", condition3Sizes[i]);
 	}
-	printf("\n");
+	fprintf(outputFile, "\n");
+	fflush(outputFile);
 	//
 
 	
@@ -93,7 +102,7 @@ periodTaskDriver(int argc, char *argv[])
 	int numJobs = findNumJobs(tasks, numTasks, hyperperiod);
 	
 
-	// printf("numJobs=%d\n", numJobs);
+	// fprintf(outputFile, "numJobs=%d\n", numJobs);
 
 	// Creating and initialising task instances.
 	TaskInstance *jobs = (TaskInstance *) malloc(sizeof(TaskInstance) * numJobs);
@@ -105,16 +114,22 @@ periodTaskDriver(int argc, char *argv[])
 	// Creating and initialising frames.
 	int frameSize = condition3Sizes[condition1Index];
 	int numFrames = hyperperiod / frameSize;
-	printf("frameSize=%d. Trying to create a schedule\nnumFrames=%d\n", frameSize, hyperperiod / frameSize);
-	Frame *frames = (Frame *) malloc(sizeof(Frame) * (hyperperiod / frameSize));
+	fprintf(outputFile, "frameSize=%d. Trying to create a schedule\nnumFrames=%d\n", frameSize, (int)hyperperiod / frameSize);
+	Frame *frames = (Frame *) malloc(sizeof(Frame) * (int)(hyperperiod / frameSize));
+	fflush(outputFile);
 	calculateSchedule(jobs, numJobs, frameSize, hyperperiod, frames);
 
 	// To print information about frames.
-	printFrameInfo(frames, numFrames);
+	printFrameInfo(frames, numFrames, frameSize);
 
 	// To store the information about frames.
 	storeFrameInfo(frames, numFrames, frameSize);
 
+	fprintf(outputFile, "hyperperiod = %d\n", hyperperiod);
+	fflush(outputFile);
+
+
+	fclose(outputFile);
 
 	// Freeing data.
 	free(condition2Sizes);

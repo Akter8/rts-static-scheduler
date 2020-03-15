@@ -12,11 +12,11 @@ createTaskInstances(Task *tasks, TaskInstance *jobs, int frameSize, int hyperper
 	int jobIndex = 0;
 	for (int i = 0; i < numTasks; ++i) // Iterates over tasks.
 	{
-		for (int j = 0; j < hyperperiod; j += tasks[i].period) // Iterates over the period of a task.
+		for (float j = 0; j < hyperperiod; j += tasks[i].period) // Iterates over the period of a task.
 		{
-			int startFrame = j / frameSize;
-			int maxFrame = (j + tasks[i].deadline) / frameSize;
-			if (j % frameSize != 0)
+			int startFrame = (int)j / frameSize;
+			int maxFrame = (int)(j + tasks[i].deadline) / frameSize;
+			if ((int)j % frameSize != 0)
 				startFrame++;
 
 			if (tasks[i].numOfSplits != 0) // If the task has been split.

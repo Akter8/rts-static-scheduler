@@ -37,7 +37,7 @@ findHyperPeriod(Task *tasks, int n)
 {
 	int ans = tasks[0].period;
 	for (int i = 1; i < n; i++) 
-        	ans = (((tasks[i].period * ans)) / (gcd(tasks[i].period, ans))); 
+        	ans = (((tasks[i].period * ans)) / (gcd((int)tasks[i].period, ans))); 
        	return ans;
 }
 

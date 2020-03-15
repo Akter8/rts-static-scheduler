@@ -12,15 +12,24 @@
 
 // This is the main driver.
 
-#include <stdio.h>
+
 #include "driverMain.h"
+
 
 int
 main(int argc, char const *argv[])
 {
+
+	char *outputFileName = OUTPUT_FILE;
+	// Opening the output file in write mode so that everything is overwritten.
+	FILE *outputFile = fopen(outputFileName,"w");
+	fclose(outputFile);
+
 	periodTaskDriver(argc, argv);
 
 	nonPeriodicJobDriver();
+
+	
 
 	return 0;
 }

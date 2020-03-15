@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "function.h"
+#include "configuration.h"
 
 
 /*
@@ -27,7 +28,6 @@ firstCheck(int argc, char *argv[])
 FILE
 *inputFileCheck(char *fileName)
 {
-	printf("The file entered is: %s\n", fileName);
 	FILE *file = fopen(fileName, "r");
 
 	// Checking if there is an error.
@@ -51,11 +51,13 @@ checkCpuUtilisation(Task *tasks, int numTasks)
 	float cpuUtilisation = calculateCpuUtilisation(tasks, numTasks);
 	if (cpuUtilisation <= 1.0f)
 	{
-		printf("CPU Utilisation <= 1: might be schedulable.\n");
+		FILE *outputFile = fopen(OUTPUT_FILE, "a");
+		fprintf(outputFile, "CPU Utilisation <= 1: might be schedulable.\n");
+		fclose(outputFile);
 	}
 	else
 	{
-		fprintf(stderr, "CPU Utilisation >= 1: cannot be scheduled\n");
+		fprintf(stderr, "CPU Utilisation > 1: cannot be scheduled\n");
 		exit(0);
 	}
 }

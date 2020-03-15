@@ -4,8 +4,8 @@ typedef struct
 {
 	int taskNum;
 	int period;
-	int deadline;
-	int wcet;
+	float deadline;
+	float wcet;
 	int numOfSplits;
 	int *splits;
 
@@ -16,7 +16,7 @@ typedef struct
 {
 	int startFrame;
 	int maxFrame;
-	int wcet;
+	float wcet;
 	int taskNum;
 	int splitNum;
 	int instanceNum;

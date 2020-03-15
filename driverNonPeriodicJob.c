@@ -10,14 +10,15 @@
  */
 
 #include "driverNonPeriodicJob.h"
-
+#include "configuration.h"
 
 int
 nonPeriodicJobDriver()
 {
-	char *aperiodicJobFileName = "aperiodicJobs.txt";
-	char *sporadicJobFileName = "sporadicJobs.txt";
-	char *frameFileName = "periodicSchedule.txt";
+	// File name initialisation.
+	char *aperiodicJobFileName = APERIODIC_JOB_FILE;
+	char *sporadicJobFileName = SPORADIC_JOB_FILE;
+	char *frameFileName = FRAME_INFO_FILE;
 
 	// Checking to see if the files are properly opened.
 	FILE *aperiodicJobsFile = inputFileCheck(aperiodicJobFileName);

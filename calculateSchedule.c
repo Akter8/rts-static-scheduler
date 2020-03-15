@@ -10,6 +10,8 @@
 void
 calculateSchedule(TaskInstance *jobs, int numJobs, int frameSize, int hyperperiod, Frame *frames)
 {
+	printf("Ima here\n");
+	fflush(stdout);
 	int numOfFrames = hyperperiod / frameSize;
 
 	int aliveCount = numJobs;

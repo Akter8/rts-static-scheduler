@@ -40,7 +40,7 @@ splitTasks(int reallocSize, int condition1Index, int *condition3Sizes, Task *tas
 
 			tasks[indicesOfJobsToSlice[i]].splits = (int *) malloc(sizeof(int) * (tasks[indicesOfJobsToSlice[i]].numOfSplits + 1));
 			
-			printf("Task-%d with wcet=%d being split into=%d splits and to: ", indicesOfJobsToSlice[i], tasks[indicesOfJobsToSlice[i]].numOfSplits, tasks[indicesOfJobsToSlice[i]].wcet);
+			printf("Task-%d with wcet=%0.1f being split into=%d splits and to: ", indicesOfJobsToSlice[i], tasks[indicesOfJobsToSlice[i]].wcet, tasks[indicesOfJobsToSlice[i]].numOfSplits);
 			
 			for (int j = 0; j < tasks[indicesOfJobsToSlice[i]].numOfSplits + 1; ++j)
 			{
@@ -48,7 +48,7 @@ splitTasks(int reallocSize, int condition1Index, int *condition3Sizes, Task *tas
 				printf("%d ", condition3Sizes[condition1Index]);
 			}
 
-			int remOfSplit = tasks[indicesOfJobsToSlice[i]].wcet % condition3Sizes[condition1Index];
+			int remOfSplit = (int)tasks[indicesOfJobsToSlice[i]].wcet % condition3Sizes[condition1Index];
 
 			if (remOfSplit != 0)
 			{

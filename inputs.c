@@ -33,7 +33,7 @@ Task
 	int i;
 	for (i = 0; i < numTasks; i++)
 	{
-		fscanf(periodicTaskFile, "%d %d %d", &tasks[i].period, &tasks[i].wcet, &tasks[i].deadline);
+		fscanf(periodicTaskFile, "%d %f %f", &tasks[i].period, &tasks[i].wcet, &tasks[i].deadline);
 		// printf("%d %d %d\n", tasks[i].period, tasks[i].wcet, tasks[i].deadline);
 
 		if (tasks[i].wcet > tasks[i].deadline)

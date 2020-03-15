@@ -11,7 +11,7 @@ void createTaskInstances(Task *, TaskInstance *, int, int, int, int);
 void calculateSchedule(TaskInstance *, int, int, int, Frame *);
 void printTaskInfo(Task *, int);
 void printJobInfo(TaskInstance *, int);
-void printFrameInfo(Frame *, int);
+void printFrameInfo(Frame *, int, int);
 void firstCheck(int, char *[]);
 FILE *inputFileCheck(char *);
 Task *periodicTaskInput(FILE *, int *);

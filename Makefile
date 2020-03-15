@@ -1,10 +1,12 @@
 CC=gcc
 
-flags=-c -Wall
+flags=-c
 
 executableName=test
 
-driver=driverMain
+driver = driverMain
+
+outputFile = outputFile.txt
 
 #all: PeriodicTask
 
@@ -51,4 +53,4 @@ utilityFunctions.o: utilityFunctions.c
 	$(CC) $(flags) utilityFunctions.c
 
 clean:
-	rm -f *.o $(executableName)
+	rm -f *.o $(executableName) $(outputFile)
