@@ -37,6 +37,7 @@ typedef struct
 }
 SporadicJob;
 
+
 typedef struct
 {
 	int taskNum;
@@ -47,12 +48,11 @@ typedef struct
 }
 PeriodicJob;
 
+
 typedef struct
 {
 	int frameNum;
 	int numPeriodicJobs;
-	int numSporadicJobs;
-	SporadicJob *sporadicJobs;
 	PeriodicJob *periodicJobs;
 	float slack;
 }

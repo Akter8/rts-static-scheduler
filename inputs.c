@@ -147,8 +147,8 @@ ScheduleFrame
 		framesData[i].periodicJobs = (PeriodicJob *) malloc(sizeof(PeriodicJob) * framesData[i].numPeriodicJobs);
 
 		// Initialising the frames.
-		framesData[i].numSporadicJobs = 0;
-		framesData[i].sporadicJobs = (SporadicJob *) malloc(sizeof(SporadicJob) * 0);
+		// framesData[i].numSporadicJobs = 0;
+		// framesData[i].sporadicJobs = (SporadicJob *) malloc(sizeof(SporadicJob) * 0);
 
 		for (int j = 0; j < framesData[i].numPeriodicJobs; ++j)
 		{

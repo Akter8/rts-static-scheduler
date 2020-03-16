@@ -17,12 +17,18 @@
 #include "configuration.h"
 
 
+/*
+ * Checks whether if there is an aperiodic job alive to be able to run
+ * at time units currentTime.
+ */
 bool
 checkAperiodicJob(AperiodicJob *aperiodicJobs, int jobIndex, float currentTime)
 {
+	// jobIndex = -1 when all jobs are done.
 	if (jobIndex == -1)
 		return false;
 
+	// If no jobs are available at current time.
 	if (aperiodicJobs[jobIndex].alive && aperiodicJobs[jobIndex].arrivalTime <= currentTime)
 		return true;
 
@@ -31,6 +37,11 @@ checkAperiodicJob(AperiodicJob *aperiodicJobs, int jobIndex, float currentTime)
 
 
 
+/*
+ * Runs aperiodic jobs till either the slack gets over, or till the aperiodic
+ * job queue is empty.
+ * Returns the amount of time aperiodic jobs ran in this call.
+ */
 float
 runAperiodic(AperiodicJob *aperiodicJobs, int numJobs, int *jobIndex, float maxExecutionTime, float currentTime, int currentFrame, int frameSize)
 {
@@ -49,18 +60,19 @@ runAperiodic(AperiodicJob *aperiodicJobs, int numJobs, int *jobIndex, float maxE
 	fprintf(outputFile, "Running Aperiodic Jobs from %0.1f to %0.1f\n", currentTime + (currentFrame *frameSize), maxExecutionTime + currentTime + (currentFrame *frameSize));
 
 	float timeExecuted = 0;
-	while (timeExecuted < maxExecutionTime)
+	while (timeExecuted < maxExecutionTime) // Execute only when we have some slack.
 	{
-		float timeLeft = maxExecutionTime - timeExecuted;
+		float timeLeft = maxExecutionTime - timeExecuted; // Max time left to run these.
 		float minTime = (aperiodicJobs[*jobIndex].timeLeft < timeLeft) ? aperiodicJobs[*jobIndex].timeLeft : timeLeft; // We can only execute this job either till it finishes, or till our slack is over. whichever is min.
 
 		timeExecuted += minTime;
 
 		aperiodicJobs[*jobIndex].timeLeft -= minTime;
 
-		if (aperiodicJobs[*jobIndex].timeLeft == 0)
+		if (aperiodicJobs[*jobIndex].timeLeft == 0)	// If the current job is done.
 		{
 			fprintf(outputFile, "Aperiodic Job: A%d has finished\n", aperiodicJobs[*jobIndex].jobNum);
+			// Changing the job's parameters.
 			aperiodicJobs[*jobIndex].alive = false;
 			(*jobIndex)++;
 			if (*jobIndex >= numJobs)
@@ -76,6 +88,12 @@ runAperiodic(AperiodicJob *aperiodicJobs, int numJobs, int *jobIndex, float maxE
 }
 
 
+
+/*
+ * Runs accepted sporadic jobs till either the slack gets over, or till the
+ * accepted job queue is empty.
+ * Returns the amount of time sporadic jobs ran for during this call.
+ */
 float
 runSporadic(SporadicJob *sporadicJobs, int numJobs, int *jobIndex, float maxExecutionTime)
 {
@@ -85,7 +103,7 @@ runSporadic(SporadicJob *sporadicJobs, int numJobs, int *jobIndex, float maxExec
 
 	FILE *outputFile = fopen(OUTPUT_FILE, "a");
 
-	fprintf(outputFile, " Running sporadicJobs for the next %0.1f units if possible.\n", maxExecutionTime);
+	fprintf(outputFile, "Running sporadicJobs for the next %0.1f units if possible.\n", maxExecutionTime);
 
 	float timeExecuted = 0;
 
@@ -100,7 +118,7 @@ runSporadic(SporadicJob *sporadicJobs, int numJobs, int *jobIndex, float maxExec
 
 		sporadicJobs[*jobIndex].timeLeft -= minTime;
 
-		if (sporadicJobs[*jobIndex].timeLeft == 0)
+		if (sporadicJobs[*jobIndex].timeLeft == 0)	// When the current job is finished.
 		{
 			fprintf(outputFile, "Sporadic Job: S%d has finished\n", sporadicJobs[*jobIndex].jobNum);
 
@@ -120,6 +138,10 @@ runSporadic(SporadicJob *sporadicJobs, int numJobs, int *jobIndex, float maxExec
 
 
 
+/*
+ * Runs a single periodic job between 20% to 100% of its worst-case execution time.
+ * Returns the amount of time the job ran for.
+ */
 float
 runPeriodic(PeriodicJob periodicJob)
 {
@@ -136,7 +158,10 @@ runPeriodic(PeriodicJob periodicJob)
 
 
 
-
+/*
+ * Finds what all sporadic jobs have to and can execute in a particular frame.
+ * Returns a list of sporadic jobs that have to run in that particular frame.
+ */
 SporadicJob
 *findSporadicJobsInFrame(SporadicJob *sporadicJobs, int numJobs, int *numJobsThisFrame, int frameNum, float slack, float *reduceSlackBy, ScheduleFrame *framesData, int numFrames)
 {
@@ -149,13 +174,13 @@ SporadicJob
 
 	int index = 0;
 
-	// Adding already accepted jobs.
+	// Adding jobs that were accepted in the previous frames and still have to finished.
 	float acceptedTime = 0;
 	for (int i = 0; i < numJobs; ++i)
 	{
 		if (sporadicJobs[i].alive && sporadicJobs[i].accepted && !sporadicJobs[i].rejected && sporadicJobs[i].startFrame <= frameNum && sporadicJobs[i].maxFrame > frameNum)
 		{	
-			fprintf(outputFile, "Accepted Sporadic job %d\n", i);
+			fprintf(outputFile, "Adding sporadic job: S%d\n", i);
 			sporadicJobsThisFrame[index++] = sporadicJobs[i];
 			*reduceSlackBy += ((sporadicJobs[i].timeLeft < slack - *reduceSlackBy) ? sporadicJobs[i].timeLeft : slack -*reduceSlackBy);
 			jobsThisFrame++;
@@ -164,7 +189,7 @@ SporadicJob
 	}
 
 
-	// Accepting new jobs.
+	// Acceptance test for new jobs arriving this frame.
 	for (int i = 0; i < numJobs; ++i)
 	{
 		// fprintf(outputFile, "Checking sporadic job %d\n", i);
@@ -172,7 +197,8 @@ SporadicJob
 		if (sporadicJobs[i].alive && !sporadicJobs[i].accepted && !sporadicJobs[i].rejected && sporadicJobs[i].startFrame <= frameNum && sporadicJobs[i].maxFrame > frameNum)
 		{
 			// fprintf(outputFile, "Sporadic job %d doing check-1\n", i);
-			// Check - 1
+
+			// Condition - 1
 			//Scheduler determines the current total slack in the frames before the deadline of Job S is at least equal to the execution time e of S.
 			float countSlack = 0;
 			for (int f = frameNum; f < numFrames; ++f)
@@ -180,7 +206,7 @@ SporadicJob
 				countSlack += framesData[f].slack;
 			}
 
-			if (countSlack < sporadicJobs[i].wcet)
+			if (countSlack < sporadicJobs[i].wcet)	// Rejecting after condition-1.
 			{
 				// fprintf(outputFile, "Rejected Sporadic job %d\n", i);
 				sporadicJobs[i].rejected = true;
@@ -190,8 +216,9 @@ SporadicJob
 
 			// fprintf(outputFile, "Sporadic Job %d passed check-1\n", i);
 
-			// Check - 2
+			// Condition - 2
 			// Scheduler determines whether any sporadic job in the system will complete late if it accepts S. If acceptance of S will not cause any sporadic job in the system to complete too late.
+			// Total slack should be reduced by the execution time of already accepted jobs that have a deadline before the job being considered.
 			acceptedTime = 0;
 			for (int j = 0; j < numJobs; ++j)
 			{
@@ -202,16 +229,16 @@ SporadicJob
 				}
 			}
 
-			if (countSlack - acceptedTime < sporadicJobs[i].wcet) // If rejected
+			if (countSlack - acceptedTime < sporadicJobs[i].wcet) // If rejected after condition-2.
 			{
 				fprintf(outputFile, "Rejected Sporadic job %d\n", i);
 				sporadicJobs[i].rejected = true;
 				sporadicJobs[i].accepted = false;
 				continue;
 			}
-			else // Else if accepted.
+			else // Else if accepted after both condition checks.
 			{
-				fprintf(outputFile, "Accepted Sporadic job %d\n", i);
+				fprintf(outputFile, "Accepted Sporadic job: S%d\n", i);
 				sporadicJobs[i].accepted = true;
 				sporadicJobs[i].rejected = false;
 				*reduceSlackBy += ((sporadicJobs[i].timeLeft < slack - *reduceSlackBy) ? sporadicJobs[i].timeLeft : slack -*reduceSlackBy);
@@ -236,6 +263,11 @@ SporadicJob
 	return sporadicJobsThisFrame;
 }
 
+
+
+/*
+ * The actual scheduler that goes through every frame and schedules jobs based on the slack available.
+ */
 void
 scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob *aperiodicJobs, int numAperiodicJobs, SporadicJob *sporadicJobs, int numSporadicJobs)
 {
@@ -271,6 +303,9 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 				else if sporadic job exists:
 					run sporadic job
 					continue
+				else:
+					set slack = time left in the frame.
+	end
 	*/
 
 	FILE *outputFile = fopen(OUTPUT_FILE, "a");
@@ -279,26 +314,33 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 	fprintf(outputFile, "Scheduler running now.\n");
 	fprintf(outputFile, "Frame size: %d, No of frames: %d\n", frameSize, numFrames);
 
-	float currentTime = 0;
-	int aperiodicIndex = 0;
-	int acceptedSporadicIndex = 0;
-	int periodicJobIndex = 0;
-	float runTime;
+	float currentTime = 0; // Refers to the current time wrt to the current frame. Can range between 0 and frameSize.
+	
+	int acceptedSporadicIndex;
+	int periodicJobIndex;
+	float runTime; // To find how for how much time a job ran.
+
+	int aperiodicIndex = -1; // Initially set.
+	if (numAperiodicJobs > 0)
+		aperiodicIndex = 0;
 
 	for (int f = 0; f < numFrames; ++f)
 	{
 		fprintf(outputFile, "\n\nFrame no: %d\n", f);
 		fprintf(outputFile, "Slack without sporadicJobs: %0.1f\n", framesData[f].slack);
 
-		acceptedSporadicIndex = -1;
-		periodicJobIndex = 0;
-		currentTime = 0;
+		acceptedSporadicIndex = -1; // Set if no sporadic jobs are to run in this frame. Will be updated.
+		periodicJobIndex = 0; // At the start of the frame, the 0th job runs first.
+		currentTime = 0; // At the start of every frame, the relative current time = 0. 
 
-		// Add to the list of accepted sporadic jobs if required
+		// Add to the list of accepted sporadic jobs if required.
 		int numSporadicJobsAtPresent;
-		float reduceSlackBy;
+		float reduceSlackBy = 0;
+		fflush(outputFile);
+		// Finding the set of sporadic jobs set to run this frame.
 		SporadicJob *acceptedSporadicJobs = findSporadicJobsInFrame(sporadicJobs, numSporadicJobs, &numSporadicJobsAtPresent, f, framesData[f].slack, &reduceSlackBy, framesData, numFrames);
 
+		// Setting the parameters in the main copy of the sporadic jobs.
 		for (int i = 0; i < numSporadicJobs; ++i)
 		{
 			if (sporadicJobs[i].alive && sporadicJobs[i].startFrame <= f && sporadicJobs[i].maxFrame > f)
@@ -318,7 +360,7 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 					sporadicJobs[i].accepted = false;
 					sporadicJobs[i].rejected = true;
 				}
-				else
+				else // Accepted.
 				{
 					sporadicJobs[i].accepted = true;
 					sporadicJobs[i].rejected = false;
@@ -331,32 +373,33 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 
 
 
-		// Reduce the available slack.
+		// Reduce the available slack after accepting sporadic jobs.
 		framesData[f].slack -= reduceSlackBy;
 
 		fprintf(outputFile, "Slack with sporadicJobs: %0.1f\n", framesData[f].slack);
 		fflush(outputFile);
 
 
-		// Sort the accepted sporadic jobs based on EDF
+		// Sort the accepted sporadic jobs based on EDF.
 		sortSporadicJobsOnEDF(acceptedSporadicJobs, 0, numSporadicJobsAtPresent - 1);
 
-		while (1)
+		while (1) // Runs all the jobs for this frame.
 		{
 			if (currentTime >= frameSize)
 				break;
 
-			if (framesData[f].slack > 0.0f)
+			if (framesData[f].slack > 0.0f) // If slack is available.
 			{
 				fprintf(outputFile, "Slack = %0.1f. Slack > 0\n", framesData[f].slack);
+				fflush(outputFile);
 				// If sporadic job exists, execute it.
 				if (acceptedSporadicIndex != -1)
 				{
-					fprintf(outputFile, "Sporadic jobs running. Job = S%d.", acceptedSporadicJobs[acceptedSporadicIndex].jobNum);
+					fprintf(outputFile, "Sporadic jobs running. Job = S%d.\n", acceptedSporadicJobs[acceptedSporadicIndex].jobNum);
 
 					runTime = runSporadic(acceptedSporadicJobs, numSporadicJobsAtPresent, &acceptedSporadicIndex, framesData[f].slack);
 
-					fprintf(outputFile, " Ran from %0.1f to %0.1fA\n", currentTime + (f * frameSize), currentTime + (f * frameSize) + runTime);
+					fprintf(outputFile, "Sporadic jobs ran from %0.1f to %0.1f\n", currentTime + (f * frameSize), currentTime + (f * frameSize) + runTime);
 
 					fflush(outputFile);
 
@@ -369,14 +412,14 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 				}
 
 				// Else if aperiodic job exists, execute it.
-				fprintf(outputFile, "Not sporadic\n");
+				fprintf(outputFile, "Sporadic jobs not available.\n");
 				fflush(outputFile);
 
 				// Check if aperiodic job is available.
 				bool aperiodicCheck = checkAperiodicJob(aperiodicJobs, aperiodicIndex, currentTime + (f * frameSize));
 				if (aperiodicCheck)
 				{
-					fprintf(outputFile, "aperiodic execution\n");
+					fprintf(outputFile, "Aperiodic jobs executing.\n");
 					runTime = runAperiodic(aperiodicJobs, numAperiodicJobs, &aperiodicIndex, framesData[f].slack, currentTime, f, frameSize);
 					framesData[f].slack -= runTime;
 					currentTime += runTime;
@@ -386,7 +429,7 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 				}
 				else
 				{
-					fprintf(outputFile, "--Aperiodic jobs not available.\n");
+					fprintf(outputFile, "Aperiodic jobs currently not available.\n");
 					fflush(outputFile);
 				}
 
@@ -396,14 +439,14 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 				{
 					runTime = runPeriodic(framesData[f].periodicJobs[periodicJobIndex]);
 
-					fprintf(outputFile, "Initial Slack: %0.1f\n", framesData[f].slack);
+					fprintf(outputFile, "Slack before periodic job: %0.1f\n", framesData[f].slack);
 					fprintf(outputFile, "Periodic Job: J%d with instance: %d running from %0.1f to %0.1f\n", framesData[f].periodicJobs[periodicJobIndex].taskNum, framesData[f].periodicJobs[periodicJobIndex].instanceNum, currentTime + (f * frameSize), currentTime + (f * frameSize) + runTime);
 
 					// Update the DS about the execution.
 					framesData[f].periodicJobs[periodicJobIndex].alive = false;
 					framesData[f].slack += (framesData[f].periodicJobs[periodicJobIndex].wcet - runTime);
 
-					fprintf(outputFile, "Slack now is: %0.1f\n\n", framesData[f].slack);
+					fprintf(outputFile, "Slack after periodic job: %0.1f\n\n", framesData[f].slack);
 					fflush(outputFile);
 
 					periodicJobIndex++;
@@ -412,34 +455,36 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 					continue;
 				}
 
-				fprintf(outputFile, "not periodic\n");
+				fprintf(outputFile, "Periodic jobs not available.\n");
 				fflush(outputFile);
 
-				// Check if aperiodic job is coming before this frame ends.
-				// float nextAperiodicJobArrivalTime;
-				// if (aperiodicIndex != -1)
-				// 	nextAperiodicJobArrivalTime = aperiodicJobs[aperiodicIndex].arrivalTime;
-				// else
-				// {
-				// 	  currentTime = frameSize;
-				// 	  continue;
-				// }
-				// // If yes, sleep till then and then run aperiodic job.
-				// if (nextAperiodicJobArrivalTime - (f * frameSize + currentTime) < frameSize)
-				// {
-				// 	fprintf(outputFile, "yes aperiodic\n");
-				// 	currentTime = nextAperiodicJobArrivalTime - (f * frameSize + currentTime);
-				// 	continue;
-				// }
-				// // If no, sleep till the end of the frame.
-				// else
-				// {
-				// 	fprintf(outputFile, "no aperiodic\n");
-				// 	currentTime = frameSize;
-				// 	continue;
-				// }
+				//Check if aperiodic job is coming before this frame ends.
+				float nextAperiodicJobArrivalTime;
+				if (aperiodicIndex != -1)
+					nextAperiodicJobArrivalTime = aperiodicJobs[aperiodicIndex].arrivalTime;
+				else
+				{
+					fprintf(outputFile, "Idle till the end of the frame.\n");
 
-				currentTime = frameSize;
+					currentTime = frameSize;
+					continue;
+				}
+				// If yes, sleep till then and then run aperiodic job.
+				if (nextAperiodicJobArrivalTime - (f * frameSize) < frameSize)
+				{
+					fprintf(outputFile, "Idle from %0.1f to %0.1f\n", currentTime, nextAperiodicJobArrivalTime - (f * frameSize));
+					currentTime = nextAperiodicJobArrivalTime - (f * frameSize);
+					fflush(outputFile);
+					continue;
+				}
+				// If no, sleep till the end of the frame.
+				else
+				{
+					fprintf(outputFile, "Idle till the end of the frame.\n");
+					currentTime = frameSize;
+					fflush(outputFile);
+					continue;
+				}				
 
 			}
 			else 	// If there is no slack available.
@@ -449,13 +494,14 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 				{
 					runTime = runPeriodic(framesData[f].periodicJobs[periodicJobIndex]);
 					framesData[f].periodicJobs[periodicJobIndex].alive = false;
-					fprintf(outputFile, "Initial Slack: %0.1f\n", framesData[f].slack);
+					fprintf(outputFile, "Slack before periodic job: %0.1f\n", framesData[f].slack);
 
+					// Updating slack.
 					framesData[f].slack += (framesData[f].periodicJobs[periodicJobIndex].wcet - runTime);
 
 					fprintf(outputFile, "Periodic Job: J%d with instance: %d running from %0.1f to %0.1f\n", framesData[f].periodicJobs[periodicJobIndex].taskNum, framesData[f].periodicJobs[periodicJobIndex].instanceNum, currentTime + (f * frameSize), currentTime + (f * frameSize) + runTime);
 
-					fprintf(outputFile, "Slack now is: %0.1f\n\n", framesData[f].slack);
+					fprintf(outputFile, "Slack after periodic job: %0.1f\n\n", framesData[f].slack);
 					fflush(outputFile);
 
 					currentTime += runTime;
@@ -467,9 +513,11 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 				// Else if sporadic jobs exist, execute them.
 				else if (acceptedSporadicIndex != -1)
 				{
-					fprintf(outputFile, "Sporadic jobs running. Job = S%d. acceptedSporadicIndex = %d", acceptedSporadicJobs[acceptedSporadicIndex].jobNum, acceptedSporadicIndex);
+					fprintf(outputFile, "Sporadic jobs running. Job = S%d.\n", acceptedSporadicJobs[acceptedSporadicIndex].jobNum);
 					runTime = runSporadic(acceptedSporadicJobs, numSporadicJobsAtPresent, &acceptedSporadicIndex, frameSize - currentTime);
-					fprintf(outputFile, " Ran from %0.1f to %0.1fB\n", currentTime + (f * frameSize), currentTime + (f * frameSize) + runTime);
+					// Not updating slack as this was a scheduled execution.
+
+					fprintf(outputFile, "Sporadic jobs ran from %0.1f to %0.1f\n", currentTime + (f * frameSize), currentTime + (f * frameSize) + runTime);
 
 					fflush(outputFile);
 
@@ -478,12 +526,16 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 					continue;
 				}
 				else
-					// Else we go to  the end of the frame.
-					currentTime = frameSize;
+				{
+					// Else we update the slack and continue.
+					framesData[f].slack = frameSize - currentTime;
+					fprintf(outputFile, "Increasing slack by %0.1f as no scheduled periodic or sporadic jobs are present.\n", frameSize - currentTime);
+					fflush(outputFile);
+				}
 			}
 		}
 
-		// Update sporadic jobs that finished.
+		// Update sporadic jobs that finished in the main copy.
 		for (int i = 0; i < numSporadicJobsAtPresent; ++i)
 		{
 			if (acceptedSporadicJobs[i].alive == false)
@@ -510,7 +562,13 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 				}
 			}
 		}
+
+
+		// Freeing memory at the end of every frame.
+		free(acceptedSporadicJobs);
 	}
+
+	// After all frames are done being scheduled.
 	fprintf(outputFile, "\n\nFinished Scheduling.\n----------------------------\n");
 	fclose(outputFile);
 

@@ -10,7 +10,7 @@
  */
 
 #include "driverNonPeriodicJob.h"
-#include "configuration.h"
+
 
 int
 nonPeriodicJobDriver()
@@ -26,8 +26,7 @@ nonPeriodicJobDriver()
 	FILE *frameFile = inputFileCheck(frameFileName);
 
 
-	int numAperiodicJobs, numSporadicJobs, numFrames;
-	int frameSize;
+	int numAperiodicJobs, numSporadicJobs, numFrames, frameSize;
 
 	// Load the data from input files onto the right data structures.
 	AperiodicJob *aperiodicJobs = aperiodicJobsInput(aperiodicJobsFile, &numAperiodicJobs);
@@ -51,7 +50,7 @@ nonPeriodicJobDriver()
 	}
 
 
-	// Print the data for debugging.
+	// Print the data onto the output file.
 	printAperiodicJobInfo(aperiodicJobs, numAperiodicJobs);
 	printSporadicJobInfo(sporadicJobs, numSporadicJobs);
 	printScheduleFrameInfo(framesData, numFrames);
@@ -59,17 +58,15 @@ nonPeriodicJobDriver()
 
 	// Start the scheduler.
 	scheduler(framesData, numFrames, frameSize, aperiodicJobs, numAperiodicJobs, sporadicJobs, numSporadicJobs);
-	//
-	//
-	// Finish the scheduler.
-	//
-	//
-
 
 
 	// Free the data.
 	free(aperiodicJobs);
 	free(sporadicJobs);
+	for (int i = 0; i < numFrames; ++i)
+	{
+		free(framesData[i].periodicJobs);
+	}
 	free(framesData);
 
 	return 0;

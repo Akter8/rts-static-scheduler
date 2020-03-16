@@ -4,3 +4,4 @@
 #include <stdbool.h>
 #include "function.h"
 #include "functionNonPeriodic.h"
+#include "configuration.h"
