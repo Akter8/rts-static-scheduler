@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include "function.h"
+#include "functionPeriodic.h"
 #include "functionNonPeriodic.h"
 
 
@@ -36,9 +36,18 @@ Task
 		fscanf(periodicTaskFile, "%d %f %f", &tasks[i].period, &tasks[i].wcet, &tasks[i].deadline);
 		// printf("%d %d %d\n", tasks[i].period, tasks[i].wcet, tasks[i].deadline);
 
+		if (tasks[i].period <= 0 || tasks[i].wcet <= 0 || tasks[i].deadline <= 0)
+		{
+			fprintf(stderr, "Encountered a negative task parameter. Please input only positive values.\n");
+			free(tasks);
+			fclose(periodicTaskFile);
+			exit(0);
+		}
+
 		if (tasks[i].wcet > tasks[i].deadline)
 		{
 			fprintf(stderr, "WCET is greater than deadline. Please input valid data.\n" );
+			free(tasks);
 			fclose(periodicTaskFile);
 			exit(0);
 		}
@@ -71,6 +80,12 @@ AperiodicJob
 	for (int i = 0; i < numJobs; ++i)
 	{
 		fscanf(aperiodicJobsFile, "%f %f", &aperiodicJobs[i].arrivalTime, &aperiodicJobs[i].wcet);
+
+		if (aperiodicJobs[i].arrivalTime < 0 || aperiodicJobs[i].wcet <= 0)
+		{
+			fprintf(stderr, "Please enter positive parameters for aperiodic jobs.\n");
+			exit(0);
+		}
 
 		// Need to store this now as they will be sorted based on arrival time.
 		aperiodicJobs[i].jobNum = i;
@@ -106,6 +121,12 @@ SporadicJob
 
 		// Need to store this now as they will be sorted based on arrival time.
 		sporadicJobs[i].jobNum = i;
+
+		if (sporadicJobs[i].arrivalTime < 0 || sporadicJobs[i].wcet <= 0 || sporadicJobs[i].deadline <= 0)
+		{
+			fprintf(stderr, "Please enter only positive value in sporadic job parameters.\n");
+			exit(0);
+		}
 
 		if (sporadicJobs[i].wcet > sporadicJobs[i].deadline)
 		{

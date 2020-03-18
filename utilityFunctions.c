@@ -1,4 +1,4 @@
-#include "function.h"
+#include "functionPeriodic.h"
 #include "functionNonPeriodic.h"
 
 // Utility function to find GCD of 'a' and 'b'. 

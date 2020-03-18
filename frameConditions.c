@@ -1,6 +1,16 @@
+/*
+ * Author: Akhil Tarikere
+ * Date: 6/3/20
+ * 
+ * Pre-Condition: Given set of tasks along with its hyperperiod.
+ *
+ * Post-Condition: The frame sizes that meet the various conditions.
+ */
+
+
 #include <stdio.h>
 #include <stdbool.h>
-#include "function.h"
+#include "functionPeriodic.h"
 
 /*
  * Returns the minimum size of the frame according to condition-1.

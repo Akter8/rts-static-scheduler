@@ -1,5 +1,6 @@
 #include "structNonPeriodic.h"
 
+int nonPeriodicJobDriver();
 AperiodicJob *aperiodicJobsInput(FILE *, int *);
 SporadicJob *sporadicJobsInput(FILE *, int *);
 ScheduleFrame *framesInput(FILE *, int *, int *);

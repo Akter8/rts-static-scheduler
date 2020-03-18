@@ -165,6 +165,23 @@ runPeriodic(PeriodicJob periodicJob)
 SporadicJob
 *findSporadicJobsInFrame(SporadicJob *sporadicJobs, int numJobs, int *numJobsThisFrame, int frameNum, float slack, float *reduceSlackBy, ScheduleFrame *framesData, int numFrames)
 {
+	/* 
+	Algorithm:
+	Find sporadic jobs that were accepted in previous frames but are yet to finish.
+	Do the acceptance test for other sporadic jobs arriving this frame.
+	Acceptance test:
+		Check-1:
+			If there is enough slack for this job in its valid frames.
+			Calculate this by adding up the slack for every frame.
+		Check-2:
+			If there is enough slack for this job along with sporadic jobs that were accepted previously.
+			Calculate this by adding the slack of that frame, but subtracting the execution time of a previously accepted sporadic job if the latter's deadline is before the former's (this will work because we are following EDF while scheduling sporadic jobs).
+		If a new sporadic job passes both the test, accept it.
+		Else reject it.
+	End 
+	*/
+
+
 	FILE *outputFile = fopen(OUTPUT_FILE, "a");
 
 	fprintf(outputFile, "Finding sporadicJobs in this frame.\n");
@@ -258,7 +275,9 @@ SporadicJob
 	*numJobsThisFrame = jobsThisFrame;
 	sporadicJobsThisFrame = realloc(sporadicJobsThisFrame, sizeof(SporadicJob) * jobsThisFrame);
 
+	fprintf(outputFile, "abcd\n");
 	fclose(outputFile);
+
 
 	return sporadicJobsThisFrame;
 }
@@ -271,7 +290,7 @@ SporadicJob
 void
 scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob *aperiodicJobs, int numAperiodicJobs, SporadicJob *sporadicJobs, int numSporadicJobs)
 {
-	/* Psuedo Code:
+	/* Algorithm:
 	In a frame f:
 		accept sporadic jobs if required.
 		sort the sporadic jobs based on EDF.
@@ -340,13 +359,15 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 		// Finding the set of sporadic jobs set to run this frame.
 		SporadicJob *acceptedSporadicJobs = findSporadicJobsInFrame(sporadicJobs, numSporadicJobs, &numSporadicJobsAtPresent, f, framesData[f].slack, &reduceSlackBy, framesData, numFrames);
 
+		fprintf(outputFile, "hello\n");
+		fflush(outputFile);
 		// Setting the parameters in the main copy of the sporadic jobs.
 		for (int i = 0; i < numSporadicJobs; ++i)
 		{
 			if (sporadicJobs[i].alive && sporadicJobs[i].startFrame <= f && sporadicJobs[i].maxFrame > f)
 			{
 				bool flag = true;
-				for (int j = 0; j < numSporadicJobs; ++j)
+				for (int j = 0; j < numSporadicJobsAtPresent; ++j)
 				{
 					if (sporadicJobs[i].jobNum == acceptedSporadicJobs[j].jobNum)
 					{
@@ -375,6 +396,7 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 
 		// Reduce the available slack after accepting sporadic jobs.
 		framesData[f].slack -= reduceSlackBy;
+
 
 		fprintf(outputFile, "Slack with sporadicJobs: %0.1f\n", framesData[f].slack);
 		fflush(outputFile);

@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
-#include "function.h"
+#include "functionPeriodic.h"
 
 /*
  * Fills in the details of the array of various instances of the tasks based on the task details.

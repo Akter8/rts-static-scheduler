@@ -24,15 +24,18 @@ For a given in-phase input task set consisting of periodic tasks [Read the input
 - [ ] Check if there are any warnings while compiling.
 - [ ] Add pre-condition and post-condition to every function.
 - [ ] Print everything to the outputfile.
+- [ ] Finish the description of files part of README.
+- [ ] Finish the README.
+- [X] Check for negative periods execution time and deadlines.
+- [ ] Comments in function.h
 
 
-### Tasks Completed
+### Tasks Completed and description of the structure of the program
 * Define the relevant ADTs.
 * Input and sort the data into the various ADTs.
 * Find CPU utilisation and Hyperperiod.
-* Generate the various jobs for periodic tasks.
-* Slice jobs if required.
-* Fit the jobs into appropriate frames.
+* Create the various task instances (jobs) for periodic tasks.
+* Slice jobs and fit them into appropriate frames.
 * Store the schedule onto periodicSchedule.txt
 * Input and sort the data based on arrival time for aperiodic and sporadic jobs.
 * Schedule the frames till the hyperperiod with the help of psuedo-random numbers for periodic jobs.
@@ -71,10 +74,23 @@ For a given in-phase input task set consisting of periodic tasks [Read the input
 
 
 ### Description of files
-* 
-*
-*
-*
+* driverMain.c - The main driver that calls other modules.
+* driverPeriodicTask.c - The driver module for the periodic tasks part.
+* driverNonPeriodicTask.c - The driver module associated with the non-periodic and scheduling part.
+* configuration.h - Contains the configuration files of the repo.
+* structPeriodic.h - ADTs associated with the periodic tasks.
+* structNonPeriodic.h - ADTs associated with scheduling and non-periodic jobs.
+* functionPeriodic.h - List of functions associated with the periodic tasks.
+* functionNonPeriodic.h - List of functions associated with non-periodic jobs.
+* inputs.c - Stores the data from input files into the ADTs.
+* checks.c - Functions related to some basic input checks.
+* frameConditions.c - Module that finds and returns possible frame sizes based on the three conditions.
+* sort.c - Sorts ADTs based on some parameter (usually arrival time).
+* createTaskInstances.c - Module that creates instances of periodic tasks.
+* findFrame.c - Finds which jobs will execute in which frame. Also does the role of splitting jobs if required.
+* utilityFunctions.c - Some utility functions.
+* printInfo.c - Prints the data in the ADTs onto the output file.
+* scheduler.c - The module associated with the scheduling of periodic + non-periodic jobs
 
 
 ### How to compile

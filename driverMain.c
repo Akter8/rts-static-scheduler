@@ -9,16 +9,19 @@
  *	
  */
 
-#include "driverMain.h"
+#include <stdio.h>
+#include "functionPeriodic.h"
+#include "functionNonPeriodic.h"
+#include "configuration.h"
 
 
 int
-main(int argc, char const *argv[])
+main(int argc, char *argv[])
 {
 	FILE *outputFile = fopen(OUTPUT_FILE, "w"); // Opening the output file in write mode so that everything is overwritten.
 	fclose(outputFile);
 
-	periodTaskDriver(argc, argv);
+	periodicTaskDriver(argc, argv);
 
 	nonPeriodicJobDriver();
 

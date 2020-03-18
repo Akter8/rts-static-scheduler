@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include "function.h"
+#include "functionPeriodic.h"
 #include "functionNonPeriodic.h"
 #include "configuration.h"
 
@@ -74,7 +74,7 @@ printFrameInfo(Frame * frames, int numFrames, int frameSize)
 	fprintf(outputFile, "Frame size: %d\n", frameSize);
 	for (int f = 0; f < numFrames; ++f)
 	{
-		fprintf(outputFile, "Frame no.%d, Jobs=\n", f);
+		fprintf(outputFile, "Frame no.%d, No of jobs=%d, Jobs=\n", frames[f].frameNum, frames[f].numJobs);
 		for (int i = 0; i < frames[f].numJobs; ++i)
 		{
 			if (frames[f].jobs[i].splitNum == -1)

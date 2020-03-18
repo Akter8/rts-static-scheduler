@@ -26,7 +26,7 @@ TaskInstance;
 
 typedef struct 
 {
-	int numFrame;
+	int frameNum;
 	int numJobs;
 	TaskInstance *jobs;
 	float slack;

@@ -9,11 +9,16 @@
  *		frame sizes that fit this tast set.
  */
 
-#include "driverPeriodicTask.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include "functionPeriodic.h"
+#include "configuration.h"
 
 
 int
-periodTaskDriver(int argc, char *argv[])
+periodicTaskDriver(int argc, char **argv)
 {
 
 	// Doing basic checks on the inputs.
@@ -91,44 +96,69 @@ periodTaskDriver(int argc, char *argv[])
 	fflush(outputFile);
 	//
 
-	
-	// Splitting the periodic tasks if required.
-	splitTasks(reallocSize, condition1Index, condition3Sizes, tasks, numTasks);
+	// ------------------------------------------------
+	// INF part.
+	int frameSize = condition3Sizes[condition1Index];
+	int numFrames = hyperperiod / frameSize;
 
-	// To print information about tasks.
-	// printTaskInfo(tasks, numTasks);
-
-	
+	// Creating task instances.
 	int numJobs = findNumJobs(tasks, numTasks, hyperperiod);
-	
-
-	// fprintf(outputFile, "numJobs=%d\n", numJobs);
-
-	// Creating and initialising task instances.
 	TaskInstance *jobs = (TaskInstance *) malloc(sizeof(TaskInstance) * numJobs);
-	createTaskInstances(tasks, jobs, condition3Sizes[condition1Index], hyperperiod, numTasks, numJobs);
+	createTaskInstances(tasks, jobs, frameSize, hyperperiod, numTasks, numJobs);
 
 	// To print information about jobs.
 	printJobInfo(jobs, numJobs);
 
-	// Creating and initialising frames.
-	int frameSize = condition3Sizes[condition1Index];
-	int numFrames = hyperperiod / frameSize;
-	fprintf(outputFile, "frameSize=%d. Trying to create a schedule\nnumFrames=%d\n", frameSize, (int)hyperperiod / frameSize);
-	Frame *frames = (Frame *) malloc(sizeof(Frame) * (int)(hyperperiod / frameSize));
-	fflush(outputFile);
-	calculateSchedule(jobs, numJobs, frameSize, hyperperiod, frames);
+	// Creating frame instances and finding which job goes into which frame.
+	Frame *frames = (Frame *) malloc(sizeof(Frame) * numFrames);
+	findFrame(jobs, numJobs, frames, frameSize, numFrames);
 
 	// To print information about frames.
 	printFrameInfo(frames, numFrames, frameSize);
 
-	// To store the information about frames.
+	free(jobs);
+	// End of INF.
+	// ------------------------------------------------
+
+	
+	// ------------------------------------------------
+	// // Splitting the periodic tasks if required.
+	// splitTasks(reallocSize, condition1Index, condition3Sizes, tasks, numTasks);
+
+	// // To print information about tasks.
+	// // printTaskInfo(tasks, numTasks);
+
+	
+	// numJobs = findNumJobs(tasks, numTasks, hyperperiod);
+	
+
+	// // fprintf(outputFile, "numJobs=%d\n", numJobs);
+
+	// // Creating and initialising task instances.
+	// jobs = (TaskInstance *) malloc(sizeof(TaskInstance) * numJobs);
+	// createTaskInstances(tasks, jobs, condition3Sizes[condition1Index], hyperperiod, numTasks, numJobs);
+
+	// // To print information about jobs.
+	// printJobInfo(jobs, numJobs);
+
+	// // Creating and initialising frames.
+	// frameSize = condition3Sizes[condition1Index];
+	// numFrames = hyperperiod / frameSize;
+	// fprintf(outputFile, "frameSize=%d. Trying to create a schedule\nnumFrames=%d\n", frameSize, numFrames);
+	// frames = (Frame *) malloc(sizeof(Frame) * numFrames);
+	// fflush(outputFile);
+	// calculateSchedule(jobs, numJobs, frameSize, hyperperiod, frames);
+
+	// // To print information about frames.
+	// printFrameInfo(frames, numFrames, frameSize);
+	// ------------------------------------------------
+
+
+	// To store the information about frames into the output file.
 	storeFrameInfo(frames, numFrames, frameSize);
 
-	fprintf(outputFile, "hyperperiod = %d\n", hyperperiod);
-	fflush(outputFile);
 
-
+	// Closing the file.
 	fclose(outputFile);
 
 	// Freeing data.
