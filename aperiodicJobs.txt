@@ -1,11 +1,30 @@
 4
+0	0.2
+1	2
+3	2
+1	1
+
+-----------------------------------------------------
+How to write input:
+First line: 			# of tasks
+						int
+Subsequent lines:		period \t execution_time
+						int \t float 
+
+Sample input:
+4
+0	0.2
+1	2
+3	2
+1	1
+
+4
 0	0.1
 1	0.5
 3	0.5
 11.8	0.5
 
-
---------
+-----------------------------------------------------
 Buggy case
 4
 0	0.2

@@ -49,16 +49,15 @@ periodicTaskDriver(int argc, char **argv)
 	fprintf(outputFile, "Hyperperiod = %d\n", hyperperiod);
 	fflush(outputFile);
 	
-	// int condition1Size, *condition2Sizes, *condition3Sizes, condition1Index, reallocSize;
-	// conditionChecker(tasks, numTasks, hyperperiod, &condition1Size, condition2Sizes, condition3Sizes, &condition1Index, &reallocSize);
-	
 	//
+
+	// Finding the frame sizes that satisfy the first condition.
 	fprintf(outputFile, "\n");
 	int condition1Size = frameSizeCondition1(tasks, numTasks);
 	fprintf(outputFile, "Condition-1: %d\n", condition1Size);
 	fflush(outputFile);
 
-
+	// Finding the frame sizes that satisfy the second condition.
 	int *condition2Sizes = (int *) malloc(sizeof(int) * hyperperiod);
 	int reallocSize = frameSizeCondition2(hyperperiod, condition2Sizes);
 	condition2Sizes = realloc(condition2Sizes, sizeof(int) * reallocSize);
@@ -74,6 +73,7 @@ periodicTaskDriver(int argc, char **argv)
 	fflush(outputFile);
 
 
+	// Finding the frame sizes that satisfy the third condition.
 	int *condition3Sizes = (int *) malloc(sizeof(int) * reallocSize);
 	reallocSize = frameSizeCondition3(condition2Sizes, tasks, reallocSize, numTasks, condition3Sizes);
 	condition3Sizes = realloc(condition3Sizes, sizeof(int) * reallocSize);
@@ -86,6 +86,8 @@ periodicTaskDriver(int argc, char **argv)
 			condition1Index2++;
 	}
 
+
+	// Finding frame sizes that satisfy all 3 conditions.
 	int condition1Index = condition1Index1 < condition1Index2 ? condition1Index1 : condition1Index2;
 	fprintf(outputFile, "Possible frame size(s) based on the three conditions: ");
 	for (int i = condition1Index+1; i < reallocSize; ++i)
@@ -96,7 +98,9 @@ periodicTaskDriver(int argc, char **argv)
 	fflush(outputFile);
 	//
 
-	// ------------------------------------------------
+	// Even if multiple frame sizes are possible, the largest valid one will be chosen as that is the one which will lead to the least number of scheduling points. 
+	// Though in this simulation the scheduling time is taken as zero, in all practical applications its not. 
+
 	// INF part.
 	int frameSize = condition3Sizes[condition1Index];
 	int numFrames = hyperperiod / frameSize;
@@ -118,42 +122,7 @@ periodicTaskDriver(int argc, char **argv)
 
 	free(jobs);
 	// End of INF.
-	// ------------------------------------------------
-
 	
-	// ------------------------------------------------
-	// // Splitting the periodic tasks if required.
-	// splitTasks(reallocSize, condition1Index, condition3Sizes, tasks, numTasks);
-
-	// // To print information about tasks.
-	// // printTaskInfo(tasks, numTasks);
-
-	
-	// numJobs = findNumJobs(tasks, numTasks, hyperperiod);
-	
-
-	// // fprintf(outputFile, "numJobs=%d\n", numJobs);
-
-	// // Creating and initialising task instances.
-	// jobs = (TaskInstance *) malloc(sizeof(TaskInstance) * numJobs);
-	// createTaskInstances(tasks, jobs, condition3Sizes[condition1Index], hyperperiod, numTasks, numJobs);
-
-	// // To print information about jobs.
-	// printJobInfo(jobs, numJobs);
-
-	// // Creating and initialising frames.
-	// frameSize = condition3Sizes[condition1Index];
-	// numFrames = hyperperiod / frameSize;
-	// fprintf(outputFile, "frameSize=%d. Trying to create a schedule\nnumFrames=%d\n", frameSize, numFrames);
-	// frames = (Frame *) malloc(sizeof(Frame) * numFrames);
-	// fflush(outputFile);
-	// calculateSchedule(jobs, numJobs, frameSize, hyperperiod, frames);
-
-	// // To print information about frames.
-	// printFrameInfo(frames, numFrames, frameSize);
-	// ------------------------------------------------
-
-
 	// To store the information about frames into the output file.
 	storeFrameInfo(frames, numFrames, frameSize);
 
@@ -170,13 +139,7 @@ periodicTaskDriver(int argc, char **argv)
 		free(frames[i].jobs);
 	}
 	free(frames);
-
-	for (int i = 0; i < numTasks; ++i)
-	{
-		free(tasks[i].splits);
-	}
 	free(tasks);
-
 	
 	return 0;
 }

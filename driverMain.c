@@ -21,8 +21,10 @@ main(int argc, char *argv[])
 	FILE *outputFile = fopen(OUTPUT_FILE, "w"); // Opening the output file in write mode so that everything is overwritten.
 	fclose(outputFile);
 
+	// Calling the periodic task part.
 	periodicTaskDriver(argc, argv);
 
+	// Calling the non-periodic and scheduling part.
 	nonPeriodicJobDriver();
 
 	return 0;

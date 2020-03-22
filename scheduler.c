@@ -145,8 +145,6 @@ runSporadic(SporadicJob *sporadicJobs, int numJobs, int *jobIndex, float maxExec
 float
 runPeriodic(PeriodicJob periodicJob)
 {
-	srand(time(NULL));
-
 	// To get a number between 0.2 and 1.0, we can generate a number between 0 and 0.8, and then add 0.2 to it.
 	float fraction = rand() % 80;
 	fraction = (float)(fraction + 20) / (float) 100;
@@ -274,8 +272,6 @@ SporadicJob
 	fprintf(outputFile, "Reducing slack by: %0.1f\n", *reduceSlackBy);
 	*numJobsThisFrame = jobsThisFrame;
 	sporadicJobsThisFrame = realloc(sporadicJobsThisFrame, sizeof(SporadicJob) * jobsThisFrame);
-
-	fprintf(outputFile, "abcd\n");
 	fclose(outputFile);
 
 
@@ -343,6 +339,9 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 	if (numAperiodicJobs > 0)
 		aperiodicIndex = 0;
 
+	// Initialising the seed before the jobs start executing.
+	srand(time(NULL));
+
 	for (int f = 0; f < numFrames; ++f)
 	{
 		fprintf(outputFile, "\n\nFrame no: %d\n", f);
@@ -356,11 +355,10 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 		int numSporadicJobsAtPresent;
 		float reduceSlackBy = 0;
 		fflush(outputFile);
+
 		// Finding the set of sporadic jobs set to run this frame.
 		SporadicJob *acceptedSporadicJobs = findSporadicJobsInFrame(sporadicJobs, numSporadicJobs, &numSporadicJobsAtPresent, f, framesData[f].slack, &reduceSlackBy, framesData, numFrames);
 
-		fprintf(outputFile, "hello\n");
-		fflush(outputFile);
 		// Setting the parameters in the main copy of the sporadic jobs.
 		for (int i = 0; i < numSporadicJobs; ++i)
 		{
@@ -577,7 +575,6 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 				{
 					if (acceptedSporadicJobs[i].jobNum == sporadicJobs[j].jobNum)
 					{
-						fprintf(outputFile, "hit\n");
 						sporadicJobs[j].timeLeft = acceptedSporadicJobs[i].timeLeft;
 						break;
 					}

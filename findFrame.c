@@ -5,7 +5,7 @@
  * Pre-Condition: Takes in the inputs of task instances.
  * 		
  * Post-Condition: Calculates which frames the jobs will have to execute in.
- * And if required, it also slices jobs to fit them into the frames.
+ * And if required, it also slices jobs to fit them into the frames using the INF algorithm.
  *
  */
 

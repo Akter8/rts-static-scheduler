@@ -3,11 +3,16 @@
  * Date: 10/3/20
  * 
  * To store the input data in appropriate data structures.
+ * Contains the ADTs of non-periodic and scheduling parts.
  *	
  */
 
 #include <stdbool.h>
 
+
+/*
+ * The ADT of an aperiodic job.
+ */
 typedef struct
 {
 	int jobNum;
@@ -19,6 +24,9 @@ typedef struct
 AperiodicJob;
 
 
+/*
+ * The ADT of a Sporadic job.
+ */
 typedef struct
 {
 	int jobNum;
@@ -38,6 +46,10 @@ typedef struct
 SporadicJob;
 
 
+
+/*
+ * The ADT of periodic job (job and not a task).
+ */
 typedef struct
 {
 	int taskNum;
@@ -49,6 +61,9 @@ typedef struct
 PeriodicJob;
 
 
+/*
+ * The ADT of a frame that will be used by the scheduler.
+ */
 typedef struct
 {
 	int frameNum;

@@ -1,16 +1,15 @@
-CC=gcc
-
-flags=-c
-
-executableName=test
-
+# Variable declaration.
+CC = gcc
+flags = -c
+executableName = test
 driver = driverMain
-
+intermediateOutputFile = periodicSchedule.txt
 outputFile = outputFile.txt
 
 
-all: $(driver).o driverPeriodicTask.o printInfo.o checks.o findFrame.o frameConditions.o createTaskInstances.o inputs.o driverNonPeriodicJob.o sort.o scheduler.o utilityFunctions.o
-	$(CC)  $(driver).o driverPeriodicTask.o printInfo.o checks.o findFrame.o frameConditions.o createTaskInstances.o inputs.o driverNonPeriodicJob.o sort.o scheduler.o utilityFunctions.o -o $(executableName)
+# Make
+all: $(driver).o driverPeriodicTask.o printInfo.o findFrame.o frameConditions.o createTaskInstances.o inputs.o driverNonPeriodicJob.o sort.o scheduler.o utilityFunctions.o
+	$(CC)  $(driver).o driverPeriodicTask.o printInfo.o findFrame.o frameConditions.o createTaskInstances.o inputs.o driverNonPeriodicJob.o sort.o scheduler.o utilityFunctions.o -o $(executableName)
 
 $(driver).o: $(driver).c
 	$(CC) $(flags) $(driver).c
@@ -39,14 +38,13 @@ frameConditions.o: frameConditions.c
 createTaskInstances.o: createTaskInstances.c
 	$(CC) $(flags) createTaskInstances.c
 
-checks.o: checks.c
-	$(CC) $(flags) checks.c
-
 inputs.o: inputs.c
 	$(CC) $(flags) inputs.c
 
 utilityFunctions.o: utilityFunctions.c
 	$(CC) $(flags) utilityFunctions.c
 
+
+# To remove all .o files and to clean the directory.
 clean:
-	rm -f *.o $(executableName) $(outputFile)
+	rm -f *.o $(executableName) $(outputFile) $(intermediateOutputFile)

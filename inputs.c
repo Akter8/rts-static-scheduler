@@ -27,15 +27,14 @@ Task
 	// Taking data from the periodic job file.
 	int numTasks;
 	fscanf(periodicTaskFile, " %d", &numTasks);
-	// printf("No. of lines = %d.\n", numTasks);
 
 	Task *tasks = (Task *) malloc(sizeof(Task) * numTasks);
 	int i;
-	for (i = 0; i < numTasks; i++)
+	for (i = 0; i < numTasks; i++) // One task at a time.
 	{
 		fscanf(periodicTaskFile, "%d %f %f", &tasks[i].period, &tasks[i].wcet, &tasks[i].deadline);
-		// printf("%d %d %d\n", tasks[i].period, tasks[i].wcet, tasks[i].deadline);
 
+		// A couple of basic checks while taking input.
 		if (tasks[i].period <= 0 || tasks[i].wcet <= 0 || tasks[i].deadline <= 0)
 		{
 			fprintf(stderr, "Encountered a negative task parameter. Please input only positive values.\n");
@@ -81,6 +80,7 @@ AperiodicJob
 	{
 		fscanf(aperiodicJobsFile, "%f %f", &aperiodicJobs[i].arrivalTime, &aperiodicJobs[i].wcet);
 
+		// Basic check after taking input.
 		if (aperiodicJobs[i].arrivalTime < 0 || aperiodicJobs[i].wcet <= 0)
 		{
 			fprintf(stderr, "Please enter positive parameters for aperiodic jobs.\n");
@@ -122,6 +122,7 @@ SporadicJob
 		// Need to store this now as they will be sorted based on arrival time.
 		sporadicJobs[i].jobNum = i;
 
+		// Basic checks after taking input.
 		if (sporadicJobs[i].arrivalTime < 0 || sporadicJobs[i].wcet <= 0 || sporadicJobs[i].deadline <= 0)
 		{
 			fprintf(stderr, "Please enter only positive value in sporadic job parameters.\n");
@@ -158,7 +159,6 @@ ScheduleFrame
 {
 	int numFrames, frameSize;
 	fscanf(framesFile, "%d %d", &frameSize, &numFrames);
-	printf("frameSize = %d, numFrames = %d\n", frameSize, numFrames);
 
 	ScheduleFrame *framesData = (ScheduleFrame *) malloc(sizeof(ScheduleFrame) * numFrames);
 
@@ -166,10 +166,6 @@ ScheduleFrame
 	{
 		fscanf(framesFile, "%f %d\n", &framesData[i].slack, &framesData[i].numPeriodicJobs);
 		framesData[i].periodicJobs = (PeriodicJob *) malloc(sizeof(PeriodicJob) * framesData[i].numPeriodicJobs);
-
-		// Initialising the frames.
-		// framesData[i].numSporadicJobs = 0;
-		// framesData[i].sporadicJobs = (SporadicJob *) malloc(sizeof(SporadicJob) * 0);
 
 		for (int j = 0; j < framesData[i].numPeriodicJobs; ++j)
 		{
@@ -180,25 +176,20 @@ ScheduleFrame
 			if (test == 'N')
 			{
 				fscanf(framesFile, "%d %d %f", &framesData[i].periodicJobs[j].taskNum, &framesData[i].periodicJobs[j].instanceNum, &framesData[i].periodicJobs[j].wcet);
-				framesData[i].periodicJobs[j].splitNum = -1;
-
-				// printf("%d %d %f\n", framesData[i].periodicJobs[j].taskNum, framesData[i].periodicJobs[j].instanceNum, framesData[i].periodicJobs[j].wcet);
-				// fflush(stdout);	
+				framesData[i].periodicJobs[j].splitNum = -1;	
 			}
 			else
 			{
-				fscanf(framesFile, "%d %d %d %f", &framesData[i].periodicJobs[j].taskNum, &framesData[i].periodicJobs[j].splitNum, &framesData[i].periodicJobs[j].instanceNum, &framesData[i].periodicJobs[j].wcet);
-				// printf("%d %d %d %f\n", framesData[i].periodicJobs[j].taskNum, framesData[i].periodicJobs[j].splitNum, framesData[i].periodicJobs[j].instanceNum, framesData[i].periodicJobs[j].wcet);
-				// fflush(stdout);	
+				fscanf(framesFile, "%d %d %d %f", &framesData[i].periodicJobs[j].taskNum, &framesData[i].periodicJobs[j].splitNum, &framesData[i].periodicJobs[j].instanceNum, &framesData[i].periodicJobs[j].wcet);	
 			}
 
 			framesData[i].periodicJobs[j].alive = true;
 		}
-		
 	}
 
 	fclose(framesFile);
 
+	// To return the values.
 	*nFrames = numFrames;
 	*fSize = frameSize;
 

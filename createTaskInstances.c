@@ -1,6 +1,18 @@
+/*
+ * Author: Akhil Tarikere
+ * Date: 9/3/20
+ * 
+ * Pre-Condition: Given a set of tasks
+ * 		
+ *
+ * Post-Condition: Creates and initialises the various jobs of that task that will be created for that hyperperiod.
+ *	
+ */
+
 #include <stdio.h>
 #include <stdbool.h>
 #include "functionPeriodic.h"
+
 
 /*
  * Fills in the details of the array of various instances of the tasks based on the task details.
@@ -14,37 +26,21 @@ createTaskInstances(Task *tasks, TaskInstance *jobs, int frameSize, int hyperper
 	{
 		for (float j = 0; j < hyperperiod; j += tasks[i].period) // Iterates over the period of a task.
 		{
+			// Calculating the startFrame and maxFrame.
 			int startFrame = (int)j / frameSize;
 			int maxFrame = (int)(j + tasks[i].deadline) / frameSize;
+
 			if ((int)j % frameSize != 0)
 				startFrame++;
 
-			if (tasks[i].numOfSplits != 0) // If the task has been split.
-			{
-				for (int k = 0; k < tasks[i].numOfSplits + 1; k++) // Iterates over the various splits of a task.
-				{
-					jobs[jobIndex].startFrame = startFrame;
-					jobs[jobIndex].maxFrame = maxFrame;
-					jobs[jobIndex].wcet = tasks[i].splits[k];
-					jobs[jobIndex].splitNum = k;
-					jobs[jobIndex].taskNum = i;
-					jobs[jobIndex].instanceNum = j / tasks[i].period;
-					jobs[jobIndex].alive = true;
-
-					jobIndex++;
-				}
-			}
-			else // If the task has not been split.
-			{
-				jobs[jobIndex].startFrame = startFrame;
-				jobs[jobIndex].maxFrame = maxFrame;
-				jobs[jobIndex].taskNum = i;
-				jobs[jobIndex].splitNum = -1;
-				jobs[jobIndex].wcet = tasks[i].wcet;
-				jobs[jobIndex].instanceNum = j / tasks[i].period;
-				jobs[jobIndex].alive = true;
-				jobIndex++;
-			}
+			jobs[jobIndex].startFrame = startFrame;
+			jobs[jobIndex].maxFrame = maxFrame;
+			jobs[jobIndex].taskNum = i;
+			jobs[jobIndex].splitNum = -1;
+			jobs[jobIndex].wcet = tasks[i].wcet;
+			jobs[jobIndex].instanceNum = j / tasks[i].period;
+			jobs[jobIndex].alive = true;
+			jobIndex++;
 		}
 	}
 

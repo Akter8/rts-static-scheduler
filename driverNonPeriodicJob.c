@@ -45,7 +45,6 @@ nonPeriodicJobDriver()
 
 
 	// Calculate the frames in which the sporadic jobs will arrive.
-	// findSporadicFrames(sporadicJobs, numSporadicJobs, frameSize);
 	for (int i = 0; i < numSporadicJobs; ++i)
 	{
 		// [startFrame, maxFrame);
