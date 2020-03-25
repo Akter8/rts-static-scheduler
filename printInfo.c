@@ -184,6 +184,7 @@ printScheduleFrameInfo(ScheduleFrame *framesData, int numFrames)
 
 	fprintf(outputFile, "----------------------------\n");
 	fprintf(outputFile, "Schedule Frame Info\n");
+	fprintf(outputFile, "NumFrame: %d\n", numFrames);
 
 	for (int f = 0; f < numFrames; ++f) // Iterates through the frames.
 	{
@@ -202,4 +203,50 @@ printScheduleFrameInfo(ScheduleFrame *framesData, int numFrames)
 	}
 
 	fclose(outputFile);
+}
+
+
+/*
+ * Prints the run time information about periodic, aperiodic and sporadic jobs
+ * after the scheduler finished.
+ */
+void
+printRunTimeSchedulingInfo(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob *aperiodicJobs, int numAperiodicJobs, SporadicJob *sporadicJobs, int numSporadicJobs)
+{
+	FILE *outputFile = fopen(OUTPUT_FILE, "a");
+
+	fprintf(outputFile, "Periodic Task Schedule Info:\n");
+
+
+
+	fprintf(outputFile, "\nSporadic Job Schedule Info:\n");
+	fprintf(outputFile, "Sporadic jobs that were accepted: ");
+	for (int i = 0; i < numSporadicJobs; ++i)
+	{
+		// fprintf(outputFile, "%d %d\n", sporadicJobs[i].accepted, sporadicJobs[i].rejected);
+		if (sporadicJobs[i].accepted  && !sporadicJobs[i].rejected)
+			fprintf(outputFile, "S%d ", sporadicJobs[i].jobNum);
+	}
+	fprintf(outputFile, ".\n");
+	fprintf(outputFile, "Sporadic jobs that were rejected: ");
+	for (int i = 0; i < numSporadicJobs; ++i)
+	{
+		if (!sporadicJobs[i].accepted  && sporadicJobs[i].rejected)
+			fprintf(outputFile, "S%d ", sporadicJobs[i].jobNum);
+	}
+	fprintf(outputFile, ".\n");
+
+
+	fprintf(outputFile, "\nAperiodic Job Schedule Info:\n");
+	for (int i = 0; i < numAperiodicJobs; ++i)
+	{
+		if (aperiodicJobs[i].alive == false && aperiodicJobs[i].timeLeft == 0)
+			fprintf(outputFile, "A%d has finished.\n", aperiodicJobs[i].jobNum);
+		else
+			fprintf(outputFile, "A%d could NOT finish.\n", aperiodicJobs[i].jobNum);
+	}
+
+
+	fclose(outputFile);
+	return;
 }

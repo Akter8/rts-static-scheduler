@@ -17,6 +17,8 @@
 #include "functionNonPeriodic.h"
 #include "configuration.h"
 
+int numPreemptions = 0;
+
 
 int
 nonPeriodicJobDriver()
@@ -43,6 +45,8 @@ nonPeriodicJobDriver()
 	sortAperiodicJobs(aperiodicJobs, 0, numAperiodicJobs - 1);
 	sortSporadicJobs(sporadicJobs, 0, numSporadicJobs - 1);
 
+	printf("%d %d\n", frameSize, numFrames);
+
 
 	// Calculate the frames in which the sporadic jobs will arrive.
 	for (int i = 0; i < numSporadicJobs; ++i)
@@ -50,7 +54,7 @@ nonPeriodicJobDriver()
 		// [startFrame, maxFrame);
 		// [.] => can use that frame as well.
 		// (.) => cannot use that frame.
-		sporadicJobs[i].startFrame = sporadicJobs[i].arrivalTime / frameSize + 1;
+		sporadicJobs[i].startFrame = sporadicJobs[i].arrivalTime / frameSize;
 		sporadicJobs[i].maxFrame = sporadicJobs[i].deadline / frameSize;
 	}
 
@@ -64,6 +68,17 @@ nonPeriodicJobDriver()
 	// Start the scheduler.
 	scheduler(framesData, numFrames, frameSize, aperiodicJobs, numAperiodicJobs, sporadicJobs, numSporadicJobs);
 
+	FILE *outputFile = fopen(OUTPUT_FILE, "a");
+	fprintf(outputFile, "Number of preemptions: %d\n\n", numPreemptions);
+	fflush(outputFile);
+	
+
+	// Prints the run time scheduler information about all types of jobs.
+	printRunTimeSchedulingInfo(framesData, numFrames, frameSize, aperiodicJobs, numAperiodicJobs, sporadicJobs, numSporadicJobs);
+
+
+	fprintf(outputFile, "--------------------THE END-------------------\n");
+	fclose(outputFile);
 
 	// Free the data.
 	free(aperiodicJobs);

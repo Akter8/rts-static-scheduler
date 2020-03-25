@@ -16,6 +16,8 @@
 #include "functionNonPeriodic.h"
 #include "configuration.h"
 
+extern int numPreemptions;
+
 
 /*
  * Checks whether if there is an aperiodic job alive to be able to run
@@ -69,6 +71,13 @@ runAperiodic(AperiodicJob *aperiodicJobs, int numJobs, int *jobIndex, float maxE
 
 		aperiodicJobs[*jobIndex].timeLeft -= minTime;
 
+		// Increment number of preemptions.
+		if (aperiodicJobs[*jobIndex].timeLeft >= timeLeft)
+		{
+			numPreemptions++;
+			fprintf(outputFile, "Aperiodic Job: A%d being preempted.\n", aperiodicJobs[*jobIndex].jobNum);
+		}
+
 		if (aperiodicJobs[*jobIndex].timeLeft == 0)	// If the current job is done.
 		{
 			fprintf(outputFile, "Aperiodic Job: A%d has finished\n", aperiodicJobs[*jobIndex].jobNum);
@@ -112,11 +121,20 @@ runSporadic(SporadicJob *sporadicJobs, int numJobs, int *jobIndex, float maxExec
 		fprintf(outputFile, "Sporadic Job: S%d timeLeft=%0.1f\n", sporadicJobs[*jobIndex].jobNum, sporadicJobs[*jobIndex].timeLeft);
 		float timeLeft = maxExecutionTime - timeExecuted; // Finding the time left.
 		float minTime = (sporadicJobs[*jobIndex].timeLeft < timeLeft) ? sporadicJobs[*jobIndex].timeLeft : timeLeft; // We can only execute this job either till it finishes, or till our slack is over. whichever is min.
-		fprintf(outputFile, "minTime = %0.1f\n", minTime);
+		// fprintf(outputFile, "minTime = %0.1f\n", minTime);
 
 		timeExecuted += minTime;
 
 		sporadicJobs[*jobIndex].timeLeft -= minTime;
+
+
+		// Increment number of preemptions.
+		if (sporadicJobs[*jobIndex].timeLeft >= timeLeft)
+		{
+			numPreemptions++;
+			fprintf(outputFile, "Sporadic Job: S%d being preempted.\n", sporadicJobs[*jobIndex].jobNum);
+		}
+
 
 		if (sporadicJobs[*jobIndex].timeLeft == 0)	// When the current job is finished.
 		{
@@ -179,7 +197,6 @@ SporadicJob
 	End 
 	*/
 
-
 	FILE *outputFile = fopen(OUTPUT_FILE, "a");
 
 	fprintf(outputFile, "Finding sporadicJobs in this frame.\n");
@@ -195,7 +212,7 @@ SporadicJob
 	{
 		if (sporadicJobs[i].alive && sporadicJobs[i].accepted && !sporadicJobs[i].rejected && sporadicJobs[i].startFrame <= frameNum && sporadicJobs[i].maxFrame > frameNum)
 		{	
-			fprintf(outputFile, "Adding sporadic job: S%d\n", i);
+			fprintf(outputFile, "Adding sporadic job: S%d\n", sporadicJobs[i].jobNum);
 			sporadicJobsThisFrame[index++] = sporadicJobs[i];
 			*reduceSlackBy += ((sporadicJobs[i].timeLeft < slack - *reduceSlackBy) ? sporadicJobs[i].timeLeft : slack -*reduceSlackBy);
 			jobsThisFrame++;
@@ -211,7 +228,7 @@ SporadicJob
 		// fprintf(outputFile, "alive=%d, accepted=%d, rejected=%d, startFrame=%d, maxFrame=%d\n", sporadicJobs[i].alive, sporadicJobs[i].accepted, sporadicJobs[i].rejected, sporadicJobs[i].startFrame, sporadicJobs[i].maxFrame);
 		if (sporadicJobs[i].alive && !sporadicJobs[i].accepted && !sporadicJobs[i].rejected && sporadicJobs[i].startFrame <= frameNum && sporadicJobs[i].maxFrame > frameNum)
 		{
-			// fprintf(outputFile, "Sporadic job %d doing check-1\n", i);
+			// fprintf(outputFile, "Sporadic job %d doing check-1\n", sporadicJobs[i].jobNum);
 
 			// Condition - 1
 			//Scheduler determines the current total slack in the frames before the deadline of Job S is at least equal to the execution time e of S.
@@ -223,13 +240,13 @@ SporadicJob
 
 			if (countSlack < sporadicJobs[i].wcet)	// Rejecting after condition-1.
 			{
-				// fprintf(outputFile, "Rejected Sporadic job %d\n", i);
+				fprintf(outputFile, "Rejected Sporadic job %d\n", sporadicJobs[i].jobNum);
 				sporadicJobs[i].rejected = true;
 				sporadicJobs[i].accepted = false;
 				continue;
 			}
 
-			// fprintf(outputFile, "Sporadic Job %d passed check-1\n", i);
+			// fprintf(outputFile, "Sporadic Job %d passed check-1\n", sporadicJobs[i].jobNum);
 
 			// Condition - 2
 			// Scheduler determines whether any sporadic job in the system will complete late if it accepts S. If acceptance of S will not cause any sporadic job in the system to complete too late.
@@ -246,14 +263,14 @@ SporadicJob
 
 			if (countSlack - acceptedTime < sporadicJobs[i].wcet) // If rejected after condition-2.
 			{
-				fprintf(outputFile, "Rejected Sporadic job %d\n", i);
+				fprintf(outputFile, "Rejected Sporadic job %d\n", sporadicJobs[i].jobNum);
 				sporadicJobs[i].rejected = true;
 				sporadicJobs[i].accepted = false;
 				continue;
 			}
 			else // Else if accepted after both condition checks.
 			{
-				fprintf(outputFile, "Accepted Sporadic job: S%d\n", i);
+				fprintf(outputFile, "Accepted Sporadic job: S%d\n", sporadicJobs[i].jobNum);
 				sporadicJobs[i].accepted = true;
 				sporadicJobs[i].rejected = false;
 				*reduceSlackBy += ((sporadicJobs[i].timeLeft < slack - *reduceSlackBy) ? sporadicJobs[i].timeLeft : slack -*reduceSlackBy);
@@ -460,7 +477,7 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 					runTime = runPeriodic(framesData[f].periodicJobs[periodicJobIndex]);
 
 					fprintf(outputFile, "Slack before periodic job: %0.1f\n", framesData[f].slack);
-					fprintf(outputFile, "Periodic Job: J%d with instance: %d running from %0.1f to %0.1f\n", framesData[f].periodicJobs[periodicJobIndex].taskNum, framesData[f].periodicJobs[periodicJobIndex].instanceNum, currentTime + (f * frameSize), currentTime + (f * frameSize) + runTime);
+					fprintf(outputFile, "Periodic Job: J%d with instance: %d, and wcet=%0.1f running from %0.1f to %0.1f\n", framesData[f].periodicJobs[periodicJobIndex].taskNum, framesData[f].periodicJobs[periodicJobIndex].instanceNum, framesData[f].periodicJobs[periodicJobIndex].wcet, currentTime + (f * frameSize), currentTime + (f * frameSize) + runTime);
 
 					// Update the DS about the execution.
 					framesData[f].periodicJobs[periodicJobIndex].alive = false;
@@ -519,7 +536,7 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 					// Updating slack.
 					framesData[f].slack += (framesData[f].periodicJobs[periodicJobIndex].wcet - runTime);
 
-					fprintf(outputFile, "Periodic Job: J%d with instance: %d running from %0.1f to %0.1f\n", framesData[f].periodicJobs[periodicJobIndex].taskNum, framesData[f].periodicJobs[periodicJobIndex].instanceNum, currentTime + (f * frameSize), currentTime + (f * frameSize) + runTime);
+					fprintf(outputFile, "Periodic Job: J%d with instance: %d, and wcet=%0.1f running from %0.1f to %0.1f\n", framesData[f].periodicJobs[periodicJobIndex].taskNum, framesData[f].periodicJobs[periodicJobIndex].instanceNum, framesData[f].periodicJobs[periodicJobIndex].wcet, currentTime + (f * frameSize), currentTime + (f * frameSize) + runTime);
 
 					fprintf(outputFile, "Slack after periodic job: %0.1f\n\n", framesData[f].slack);
 					fflush(outputFile);

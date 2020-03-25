@@ -1,14 +1,14 @@
 4
-1	2	10
-2	2	10
-4	1	20
-7	1	20
+4	5	20
+7	5	20
+10	4	20
+13	3	20
 
 -----------------------------------------------------
 How to write input:
 First line: 			# of tasks
 						int
-Subsequent lines:		period \t wcet \t deadline
+Subsequent lines:		period \t execution time \t deadline
 						int \t float \t float
 
 Sample input:
@@ -17,6 +17,12 @@ Sample input:
 2	2	10
 4	1	20
 7	1	20
+
+4
+4	5	20
+7	5	20
+10	4	20
+13	3	20
 
 ------------------------------------------------------
 Buggy cases:

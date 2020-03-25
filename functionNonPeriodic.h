@@ -24,6 +24,7 @@ void mergeSporadicJobsOnEDF(SporadicJob *, int, int, int);
 void printAperiodicJobInfo(AperiodicJob *, int);
 void printSporadicJobInfo(SporadicJob *, int);
 void printScheduleFrameInfo(ScheduleFrame *, int);
+void printRunTimeSchedulingInfo(ScheduleFrame *, int, int, AperiodicJob *, int, SporadicJob *, int);
 
 // The scheduler module (scheduler.c)
 bool checkAperiodicJob(AperiodicJob *, int, float);

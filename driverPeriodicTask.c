@@ -102,7 +102,9 @@ periodicTaskDriver(int argc, char **argv)
 	// Though in this simulation the scheduling time is taken as zero, in all practical applications its not. 
 
 	// INF part.
-	int frameSize = condition3Sizes[condition1Index];
+	// We care only about the condition3Sizes as condition3Sizes are a subset of condition2Sizes.
+	// Condition1Size is the one that can be bent around a little if the task instances need to be split. This is automatically taken care of by the INF algorithm in findFrame in splitJobs().
+	int frameSize = condition3Sizes[reallocSize - 1];
 	int numFrames = hyperperiod / frameSize;
 
 	// Creating task instances.
@@ -115,6 +117,7 @@ periodicTaskDriver(int argc, char **argv)
 
 	// Creating frame instances and finding which job goes into which frame.
 	Frame *frames = (Frame *) malloc(sizeof(Frame) * numFrames);
+	// Job splitting might occur if necessary in the below funcion call.
 	findFrame(jobs, numJobs, frames, frameSize, numFrames);
 
 	// To print information about frames.

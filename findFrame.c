@@ -166,6 +166,7 @@ findFrame(TaskInstance *jobs, int numJobs, Frame *frames, int frameSize, int num
 	FILE *outputFile = fopen(OUTPUT_FILE, "a");
 	fprintf(outputFile, "----------------------------\n");
 	fprintf(outputFile, "Finding frames for all jobs.\n");
+	fprintf(outputFile, "frameSize: %d, NumFrame: %d\n", frameSize, numFrames);
 
 	for (int i = 0; i < numJobs; ++i) // Iterates over jobs.
 	{

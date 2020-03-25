@@ -14,13 +14,16 @@ For a given in-phase input task set consisting of periodic tasks [Read the input
 
 
 ### Tasks to be done
-- [ ] Remove the bug in the scheduler module.
-- [ ] While selecting a job that has been split, making sure that the there is an order that is followed.
 - [ ] Make the fprintfs in the scheduler neat.
 - [ ] Check if there are any warnings while compiling.
 - [ ] Finish the README.
 - [ ] Comments and testing of periodicTaskDriver.c in the 3 checks part.
 - [ ] Test the program with lots of test cases for bugs.
+- [ ] Periodic jobs: Min, max and avg response time.
+- [ ] Periodic jobs: Absolute and relative jitters.
+- [X] Sporadic jobs: List of accepted and rejected jobs with their response times.
+- [X] Aperiodic jobs: Response times of jobs that finished.
+- [X] Number of preemptions.
 
 
 ### Tasks Completed
@@ -89,6 +92,15 @@ For a given in-phase input task set consisting of periodic tasks [Read the input
 8. The simulation does not take into consideration the amount of slack while scheduling aperiodic or extra sporadic jobs. It reality it does not make sense to schedule such jobs if the slack is not at least enough to finish a good amount of the jobs.
 9. The release time jitters and the scheduling time for every frame is considered to be zero, which is not the case in practical systems.
 10. A sporadic job may be rejected initially because there may not be enough time to run it. But periodic jobs not running for their 100% worst-case time might produce enough slack to be able to run it.
+11. INF being a job-level splitting algorithm is at a disadvantage against a task-level splitting algorithm as for every instance of the task there might be splits that need to happen. But the advantage is that sometimes these splits need not be the same for every task instance in job-level splitting, whereas in task-level splitting, we are forced to split for the critical instance of the task (which may not be required for all other instances).
+12. The INF algorithm may choose to split jobs of different tasks instead of sticking to splitting jobs of just of one task. That is an inherent disadvantage of the algorithm itself.
+	Ex: If we have the following input in the periodicTasks.txt
+		4
+		4	1	4
+		5	1.5	5
+		10	3.5	10
+		20	0.9	20
+	We could get away with splitting jobs of T2 into 4. But the INF algorithm might choose to split T2 into 3 and T3 into 2.
 
 
 
