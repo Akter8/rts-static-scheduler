@@ -17,6 +17,12 @@
 #include "functionNonPeriodic.h"
 #include "configuration.h"
 
+extern int numTasks;
+extern Task *tasks;
+extern AperiodicJob *aperiodicJobs;
+extern SporadicJob *sporadicJobs;
+extern ScheduleFrame *framesData;
+
 int numPreemptions = 0;
 
 
@@ -37,15 +43,13 @@ nonPeriodicJobDriver()
 	int numAperiodicJobs, numSporadicJobs, numFrames, frameSize;
 
 	// Load the data from input files onto the right data structures.
-	AperiodicJob *aperiodicJobs = aperiodicJobsInput(aperiodicJobsFile, &numAperiodicJobs);
-	SporadicJob *sporadicJobs = sporadicJobsInput(sporadicJobsFile, &numSporadicJobs);
-	ScheduleFrame *framesData = framesInput(frameFile, &numFrames, &frameSize);
+	aperiodicJobs = aperiodicJobsInput(aperiodicJobsFile, &numAperiodicJobs);
+	sporadicJobs = sporadicJobsInput(sporadicJobsFile, &numSporadicJobs);
+	framesData = framesInput(frameFile, &numFrames, &frameSize);
 
 	// Sort the aperiodic and sporadic jobs based on arrival time.
 	sortAperiodicJobs(aperiodicJobs, 0, numAperiodicJobs - 1);
 	sortSporadicJobs(sporadicJobs, 0, numSporadicJobs - 1);
-
-	printf("%d %d\n", frameSize, numFrames);
 
 
 	// Calculate the frames in which the sporadic jobs will arrive.
@@ -77,7 +81,7 @@ nonPeriodicJobDriver()
 	printRunTimeSchedulingInfo(framesData, numFrames, frameSize, aperiodicJobs, numAperiodicJobs, sporadicJobs, numSporadicJobs);
 
 
-	fprintf(outputFile, "--------------------THE END-------------------\n");
+	// Cleaning up memory before program exiting.
 	fclose(outputFile);
 
 	// Free the data.
@@ -88,6 +92,11 @@ nonPeriodicJobDriver()
 		free(framesData[i].periodicJobs);
 	}
 	free(framesData);
+	for (int i = 0; i < numTasks; ++i)
+	{
+		free(tasks[i].responseTimes);
+	}
+	free(tasks);
 
 	return 0;
 }

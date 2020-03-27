@@ -16,6 +16,12 @@
 #include "functionPeriodic.h"
 #include "configuration.h"
 
+// The global ADTs defined in driverMain.c
+extern int numTasks;
+extern Task* tasks;
+extern TaskInstance *jobs;
+extern Frame *frames;
+
 
 int
 periodicTaskDriver(int argc, char **argv)
@@ -28,9 +34,8 @@ periodicTaskDriver(int argc, char **argv)
 	FILE *outputFile = fopen(OUTPUT_FILE, "a");
 	
 
-	int numTasks;
 	// Taking in input for periodic tasks.
-	Task *tasks = periodicTaskInput(periodicJobFile, &numTasks);
+	tasks = periodicTaskInput(periodicJobFile, &numTasks);
 
 	// Sorting the inputs based on their period.
 	sortTasks(tasks, 0, numTasks - 1);
@@ -109,14 +114,14 @@ periodicTaskDriver(int argc, char **argv)
 
 	// Creating task instances.
 	int numJobs = findNumJobs(tasks, numTasks, hyperperiod);
-	TaskInstance *jobs = (TaskInstance *) malloc(sizeof(TaskInstance) * numJobs);
+	jobs = (TaskInstance *) malloc(sizeof(TaskInstance) * numJobs);
 	createTaskInstances(tasks, jobs, frameSize, hyperperiod, numTasks, numJobs);
 
 	// To print information about jobs.
 	printJobInfo(jobs, numJobs);
 
 	// Creating frame instances and finding which job goes into which frame.
-	Frame *frames = (Frame *) malloc(sizeof(Frame) * numFrames);
+	frames = (Frame *) malloc(sizeof(Frame) * numFrames);
 	// Job splitting might occur if necessary in the below funcion call.
 	findFrame(jobs, numJobs, frames, frameSize, numFrames);
 
@@ -142,7 +147,8 @@ periodicTaskDriver(int argc, char **argv)
 		free(frames[i].jobs);
 	}
 	free(frames);
-	free(tasks);
+
+	// Not freeing tasks (Task *) as it will be used later.
 	
 	return 0;
 }

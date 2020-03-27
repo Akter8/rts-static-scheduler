@@ -28,8 +28,10 @@ void printRunTimeSchedulingInfo(ScheduleFrame *, int, int, AperiodicJob *, int, 
 
 // The scheduler module (scheduler.c)
 bool checkAperiodicJob(AperiodicJob *, int, float);
-float runPeriodic(PeriodicJob);
+float
+runAperiodic(AperiodicJob *, int, int *, float, float, int, int);
+float runAPeriodic(PeriodicJob);
 SporadicJob *findSporadicJobsInFrame(SporadicJob *, int, int *, int, float, float *, ScheduleFrame *, int);
-float runSporadic(SporadicJob *, int , int *, float);
+float runSporadic(SporadicJob *, int , int *, float, float, int, int);
 float runPeriodic(PeriodicJob);
 void scheduler(ScheduleFrame *, int, int, AperiodicJob *, int, SporadicJob *, int);

@@ -20,6 +20,7 @@ typedef struct
 	float wcet;
 	bool alive;
 	float timeLeft;
+	float responseTime;
 }
 AperiodicJob;
 
@@ -42,6 +43,7 @@ typedef struct
 	bool accepted;
 	bool rejected;
 	float timeLeft;
+	float responseTime;
 }
 SporadicJob;
 
@@ -57,6 +59,8 @@ typedef struct
 	int splitNum;
 	float wcet;
 	bool alive;
+	float finishTime;
+	float responseTime;
 }
 PeriodicJob;
 

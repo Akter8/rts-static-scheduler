@@ -17,6 +17,8 @@ typedef struct
 	int period;
 	float deadline;
 	float wcet;
+	int numInstances;
+	float *responseTimes;
 }
 Task;
 

@@ -13,9 +13,15 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <float.h>
+
 #include "functionPeriodic.h"
 #include "functionNonPeriodic.h"
 #include "configuration.h"
+
+
+extern Task *tasks;
+extern int numTasks;
 
 
 /*
@@ -206,6 +212,7 @@ printScheduleFrameInfo(ScheduleFrame *framesData, int numFrames)
 }
 
 
+
 /*
  * Prints the run time information about periodic, aperiodic and sporadic jobs
  * after the scheduler finished.
@@ -215,33 +222,127 @@ printRunTimeSchedulingInfo(ScheduleFrame *framesData, int numFrames, int frameSi
 {
 	FILE *outputFile = fopen(OUTPUT_FILE, "a");
 
+	// Create and initialise the response time values.
+	for (int i = 0; i < numTasks; ++i)
+	{
+		tasks[i].responseTimes = (float *) calloc(tasks[i].numInstances, sizeof(float));
+	}
+
+	// Find the values of the response times.
+	for (int i = 0; i < numFrames; ++i) // Going through each frame.
+	{
+		for (int j = 0; j < framesData[i].numPeriodicJobs; ++j) // Going through each periodic job in that frame.
+		{
+			for (int k = 0; k < numTasks; ++k) // Going through all the tasks of the task set.
+			{
+				// Checking if the task instance corresponds to that task.
+				if (framesData[i].periodicJobs[j].taskNum == tasks[k].taskNum)
+				{
+					framesData[i].periodicJobs[j].responseTime = framesData[i].periodicJobs[j].finishTime - tasks[k].period * framesData[i].periodicJobs[j].instanceNum;
+					// printf("Job J%d,%d with finish time of %0.1f and a responseTime of %0.1f\n", framesData[i].periodicJobs[j].taskNum, framesData[i].periodicJobs[j].instanceNum, framesData[i].periodicJobs[j].finishTime, framesData[i].periodicJobs[j].responseTime);
+
+					// The value will increase if that instance of the job had been split in to multiple jobs. The split job with the highest response time will become the response time for the overall task instance.
+					if (tasks[k].responseTimes[framesData[i].periodicJobs[j].instanceNum] < framesData[i].periodicJobs[j].responseTime)
+						tasks[k].responseTimes[framesData[i].periodicJobs[j].instanceNum] = framesData[i].periodicJobs[j].responseTime;
+					break;
+				}
+			}
+		}
+	}
+
 	fprintf(outputFile, "Periodic Task Schedule Info:\n");
+	fprintf(outputFile, "Response Times:\n");
+	// Going through all the response times of the task instances of that job and also finding min, max and avg.
+	for (int i = 0; i < numTasks; ++i)
+	{
+		fprintf(outputFile, "Response times of Task-%d: ", tasks[i].taskNum);
+		// To find the min, max and avg.
+		float min = FLT_MAX, max = -FLT_MAX, avg = 0;
+		for (int j = 0; j < tasks[i].numInstances; ++j)
+		{
+			fprintf(outputFile, ", %0.1f", tasks[i].responseTimes[j]);
+
+			if (tasks[i].responseTimes[j] < min)
+				min = tasks[i].responseTimes[j];
+
+			if (tasks[i].responseTimes[j] > max)
+				max = tasks[i].responseTimes[j];
+
+			avg = avg + tasks[i].responseTimes[j];
+		}
+		fprintf(outputFile, "; Max: %0.1f, Min: %0.1f, Avg: %0.1f\n", max, min, avg / tasks[i].numInstances);
+	}
+	fprintf(outputFile, "\n");
+
+	// To calculate the jitters of the same response times.
+	fprintf(outputFile, "Response Time Jitters:\n");
+	for (int i = 0; i < numTasks; ++i)
+	{
+		fprintf(outputFile, "T%d: ", tasks[i].taskNum);
+		float min = FLT_MAX, max = -FLT_MAX, avg = 0;
+		for (int j = 0; j < tasks[i].numInstances; ++j)
+		{
+			if (tasks[i].responseTimes[j] < min)
+				min = tasks[i].responseTimes[j];
+
+			if (tasks[i].responseTimes[j] > max)
+				max = tasks[i].responseTimes[j];
+		}
+		fprintf(outputFile, "Absolute RTJ: %0.1f, Relative RTJ: ", max - min);
+
+		// Relative response time jitter cannot be defined for a task set with only one job.
+		if (tasks[i].numInstances == 1)
+		{
+			fprintf(outputFile, "Not defined as numInstances are 1.\n");
+			continue;
+		}
+
+		// For finding the relative response time jitter.
+		max = 0;
+		for (int j = 0; j < tasks[i].numInstances - 1; ++j)
+		{
+			// Since we have to consider both cases of negative and positive difference.
+			if (floatAbs(tasks[i].responseTimes[j+1] - tasks[i].responseTimes[j]) > max)
+				max = floatAbs(tasks[i].responseTimes[j+1] - tasks[i].responseTimes[j]);
+		}
+
+		// For comparision between J0 and Jn (where n = numInstances - 1)
+		// This is because after the hyperperiod, when the first job continues again, it will be right after the last job.
+		int j = tasks[i].numInstances - 1;
+		if (floatAbs(tasks[i].responseTimes[j] - tasks[i].responseTimes[0]) > max)
+			max = floatAbs(tasks[i].responseTimes[j] - tasks[i].responseTimes[0]);
+
+		fprintf(outputFile, "%0.1f\n", max);
+	}
+	fprintf(outputFile, "\n");
 
 
 
+	// Response times for sporadic jobs.
 	fprintf(outputFile, "\nSporadic Job Schedule Info:\n");
-	fprintf(outputFile, "Sporadic jobs that were accepted: ");
+	fprintf(outputFile, "Sporadic jobs that were accepted:\n");
 	for (int i = 0; i < numSporadicJobs; ++i)
 	{
 		// fprintf(outputFile, "%d %d\n", sporadicJobs[i].accepted, sporadicJobs[i].rejected);
 		if (sporadicJobs[i].accepted  && !sporadicJobs[i].rejected)
-			fprintf(outputFile, "S%d ", sporadicJobs[i].jobNum);
+			fprintf(outputFile, "S%d completed with a response time: %0.1f\n", sporadicJobs[i].jobNum, sporadicJobs[i].responseTime);
 	}
-	fprintf(outputFile, ".\n");
+	fprintf(outputFile, "\n");
 	fprintf(outputFile, "Sporadic jobs that were rejected: ");
 	for (int i = 0; i < numSporadicJobs; ++i)
 	{
 		if (!sporadicJobs[i].accepted  && sporadicJobs[i].rejected)
 			fprintf(outputFile, "S%d ", sporadicJobs[i].jobNum);
 	}
-	fprintf(outputFile, ".\n");
+	fprintf(outputFile, "\n");
 
 
+	// Response times for aperiodic jobs that finished.
 	fprintf(outputFile, "\nAperiodic Job Schedule Info:\n");
 	for (int i = 0; i < numAperiodicJobs; ++i)
 	{
-		if (aperiodicJobs[i].alive == false && aperiodicJobs[i].timeLeft == 0)
-			fprintf(outputFile, "A%d has finished.\n", aperiodicJobs[i].jobNum);
+		if (!aperiodicJobs[i].alive && aperiodicJobs[i].timeLeft == 0)
+			fprintf(outputFile, "A%d has finished. Response time: %0.1f\n", aperiodicJobs[i].jobNum, aperiodicJobs[i].responseTime);
 		else
 			fprintf(outputFile, "A%d could NOT finish.\n", aperiodicJobs[i].jobNum);
 	}

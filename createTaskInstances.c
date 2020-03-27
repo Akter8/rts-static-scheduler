@@ -24,6 +24,8 @@ createTaskInstances(Task *tasks, TaskInstance *jobs, int frameSize, int hyperper
 	int jobIndex = 0;
 	for (int i = 0; i < numTasks; ++i) // Iterates over tasks.
 	{
+		tasks[i].numInstances = hyperperiod / tasks[i].period;
+
 		for (float j = 0; j < hyperperiod; j += tasks[i].period) // Iterates over the period of a task.
 		{
 			// Calculating the startFrame and maxFrame.

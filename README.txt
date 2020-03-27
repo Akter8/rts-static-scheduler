@@ -19,11 +19,6 @@ For a given in-phase input task set consisting of periodic tasks [Read the input
 - [ ] Finish the README.
 - [ ] Comments and testing of periodicTaskDriver.c in the 3 checks part.
 - [ ] Test the program with lots of test cases for bugs.
-- [ ] Periodic jobs: Min, max and avg response time.
-- [ ] Periodic jobs: Absolute and relative jitters.
-- [X] Sporadic jobs: List of accepted and rejected jobs with their response times.
-- [X] Aperiodic jobs: Response times of jobs that finished.
-- [X] Number of preemptions.
 
 
 ### Tasks Completed
@@ -82,7 +77,7 @@ For a given in-phase input task set consisting of periodic tasks [Read the input
 
 
 ### Limitations
-1. Since the float data shown on the screen has a granularity of 0.1, various times printed on the screen may make it seem that the job may have not executed (Example: Job running for 13.1 to 13.1 might be printed on the screen. But in reality the job may have run from 13.12 to 13.19).
+1. Since the float data shown on the screen has a granularity of 0.1, various times printed on the screen may make it seem that the job may have not executed (Example: Job running for 13.1 to 13.1 might be printed on the screen. But in reality the job may have run from 13.12 to 13.19). A lot of times the slack value is printed as 0, while in fact it may not truly be equal to 0.
 2. This simulation does not consider the scenario where aperiodic and sporadic jobs also have a variable time of execution.
 3. This simulation also does not consider aperiodic and sporadic tasks, we only consider them as single task instances.
 4. Scheduling only till hyperperiod. This might not be the best way to simulate sporadic and aperiodic jobs as their deadlines might be after the hyperperiod.

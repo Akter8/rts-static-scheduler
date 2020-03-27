@@ -28,6 +28,19 @@ gcd(int a, int b)
 
 
 /*
+ * Utility function to find absolute value of 'x'.
+ */
+float
+floatAbs(float x)
+{
+	if (x > 0)
+		return x;
+	else
+		return -x;
+}
+
+
+/*
  * Finds and returns the CPU utilisation.
  * CPU utilisation = sum(ei/pi)
  */

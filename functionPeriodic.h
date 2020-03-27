@@ -43,4 +43,5 @@ float calculateCpuUtilisation(Task *, int);
 void checkCpuUtilisation(Task*, int);
 int findHyperPeriod(Task *, int);
 int gcd(int, int);
+float floatAbs(float);
 int findNumJobs(Task *, int, int);
