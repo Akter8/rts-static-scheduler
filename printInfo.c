@@ -260,7 +260,7 @@ printRunTimeSchedulingInfo(ScheduleFrame *framesData, int numFrames, int frameSi
 		float min = FLT_MAX, max = -FLT_MAX, avg = 0;
 		for (int j = 0; j < tasks[i].numInstances; ++j)
 		{
-			fprintf(outputFile, ", %0.1f", tasks[i].responseTimes[j]);
+			fprintf(outputFile, "%0.1f, ", tasks[i].responseTimes[j]);
 
 			if (tasks[i].responseTimes[j] < min)
 				min = tasks[i].responseTimes[j];
@@ -273,6 +273,9 @@ printRunTimeSchedulingInfo(ScheduleFrame *framesData, int numFrames, int frameSi
 		fprintf(outputFile, "; Max: %0.1f, Min: %0.1f, Avg: %0.1f\n", max, min, avg / tasks[i].numInstances);
 	}
 	fprintf(outputFile, "\n");
+
+
+	fprintf(outputFile, "Disclaimer: Relative Response Jitter time will be the same as hyperperiod=%d as number of jobs of this task is one. Can only compare with the next job which is in the next hyperperiod.\n", frameSize * numFrames);
 
 	// To calculate the jitters of the same response times.
 	fprintf(outputFile, "Response Time Jitters:\n");
@@ -293,7 +296,7 @@ printRunTimeSchedulingInfo(ScheduleFrame *framesData, int numFrames, int frameSi
 		// Relative response time jitter cannot be defined for a task set with only one job.
 		if (tasks[i].numInstances == 1)
 		{
-			fprintf(outputFile, "Not defined as numInstances are 1.\n");
+			fprintf(outputFile, "%d\n", numFrames * frameSize);
 			continue;
 		}
 
@@ -303,6 +306,7 @@ printRunTimeSchedulingInfo(ScheduleFrame *framesData, int numFrames, int frameSi
 		{
 			// Since we have to consider both cases of negative and positive difference.
 			if (floatAbs(tasks[i].responseTimes[j+1] - tasks[i].responseTimes[j]) > max)
+				// floatAbs of x returns the absolute value of x.
 				max = floatAbs(tasks[i].responseTimes[j+1] - tasks[i].responseTimes[j]);
 		}
 
@@ -310,6 +314,7 @@ printRunTimeSchedulingInfo(ScheduleFrame *framesData, int numFrames, int frameSi
 		// This is because after the hyperperiod, when the first job continues again, it will be right after the last job.
 		int j = tasks[i].numInstances - 1;
 		if (floatAbs(tasks[i].responseTimes[j] - tasks[i].responseTimes[0]) > max)
+			// floatAbs of x returns the absolute value of x.
 			max = floatAbs(tasks[i].responseTimes[j] - tasks[i].responseTimes[0]);
 
 		fprintf(outputFile, "%0.1f\n", max);
@@ -318,16 +323,17 @@ printRunTimeSchedulingInfo(ScheduleFrame *framesData, int numFrames, int frameSi
 
 
 
-	// Response times for sporadic jobs.
+	// Response times for sporadic jobs that were accepted.
 	fprintf(outputFile, "\nSporadic Job Schedule Info:\n");
 	fprintf(outputFile, "Sporadic jobs that were accepted:\n");
 	for (int i = 0; i < numSporadicJobs; ++i)
 	{
-		// fprintf(outputFile, "%d %d\n", sporadicJobs[i].accepted, sporadicJobs[i].rejected);
 		if (sporadicJobs[i].accepted  && !sporadicJobs[i].rejected)
 			fprintf(outputFile, "S%d completed with a response time: %0.1f\n", sporadicJobs[i].jobNum, sporadicJobs[i].responseTime);
 	}
 	fprintf(outputFile, "\n");
+
+	// Lists the sporadic jobs that were rejected.
 	fprintf(outputFile, "Sporadic jobs that were rejected: ");
 	for (int i = 0; i < numSporadicJobs; ++i)
 	{
@@ -338,6 +344,7 @@ printRunTimeSchedulingInfo(ScheduleFrame *framesData, int numFrames, int frameSi
 
 
 	// Response times for aperiodic jobs that finished.
+	// Also lists aperiodic jobs that couldn't finish.
 	fprintf(outputFile, "\nAperiodic Job Schedule Info:\n");
 	for (int i = 0; i < numAperiodicJobs; ++i)
 	{

@@ -167,6 +167,8 @@ findFrame(TaskInstance *jobs, int numJobs, Frame *frames, int frameSize, int num
 	fprintf(outputFile, "----------------------------\n");
 	fprintf(outputFile, "Finding frames for all jobs.\n");
 	fprintf(outputFile, "frameSize: %d, NumFrame: %d\n", frameSize, numFrames);
+	fprintf(outputFile, "\nDisclaimer: INF being a job-level splitting algorithm is at a disadvantage against a task-level splitting algorithm as for every instance of the task there might be splits that need to happen. But the advantage is that sometimes these splits need not be the same for every task instance in job-level splitting, whereas in task-level splitting, we are forced to split for the critical instance of the task (which may not be required for all other instances).\n");
+	fprintf(outputFile, "\nDisclaimer: The INF algorithm may choose to split jobs of different tasks instead of sticking to splitting jobs of just of one task. That is an inherent disadvantage of the algorithm itself.\n\n");
 
 	for (int i = 0; i < numJobs; ++i) // Iterates over jobs.
 	{

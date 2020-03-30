@@ -58,7 +58,7 @@ For a given in-phase input task set consisting of periodic tasks [Read the input
 * createTaskInstances.c - Module that creates instances of periodic tasks.
 * findFrame.c - Finds which jobs will execute in which frame. Also does the role of splitting jobs if required.
 * utilityFunctions.c - Some utility functions.
-* printInfo.c - Prints the data in the ADTs onto the output file.
+* printInfo.c - Prints the data in the ADTs and the scheduling information onto the output file.
 * scheduler.c - The module associated with the scheduling of periodic + non-periodic jobs
 #### Once the program is compiled
 * executableName (variable in the Makefile) - The final executable.

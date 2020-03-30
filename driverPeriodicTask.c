@@ -53,8 +53,6 @@ periodicTaskDriver(int argc, char **argv)
 	int hyperperiod = findHyperPeriod(tasks, numTasks);
 	fprintf(outputFile, "Hyperperiod = %d\n", hyperperiod);
 	fflush(outputFile);
-	
-	//
 
 	// Finding the frame sizes that satisfy the first condition.
 	fprintf(outputFile, "\n");
@@ -71,7 +69,7 @@ periodicTaskDriver(int argc, char **argv)
 	for (int i = 0; i < reallocSize; ++i)
 	{
 		fprintf(outputFile, "%d ", condition2Sizes[i]);
-		if(condition2Sizes[i] <= condition1Size)
+		if(condition2Sizes[i] < condition1Size)
 			condition1Index1++;
 	}
 	fprintf(outputFile, "\n");
@@ -87,21 +85,20 @@ periodicTaskDriver(int argc, char **argv)
 	for (int i = 0; i < reallocSize; ++i)
 	{
 		fprintf(outputFile, "%d ", condition3Sizes[i]);
-		if(condition3Sizes[i] <= condition1Size)
+		if(condition3Sizes[i] < condition1Size)
 			condition1Index2++;
 	}
 
-
 	// Finding frame sizes that satisfy all 3 conditions.
-	int condition1Index = condition1Index1 < condition1Index2 ? condition1Index1 : condition1Index2;
-	fprintf(outputFile, "Possible frame size(s) based on the three conditions: ");
-	for (int i = condition1Index+1; i < reallocSize; ++i)
+	fprintf(outputFile, "\nPossible frame size(s) based on the three conditions (Might be empty if none of them are possible): ");
+	for (int i = condition1Index2 + 1; i < reallocSize; ++i)
 	{
 		fprintf(outputFile, "%d ", condition3Sizes[i]);
 	}
 	fprintf(outputFile, "\n");
+	fprintf(outputFile, "Disclaimer: If multiple frame sizes are possible in the end, the numerically largest one will be chosen as the frame size as that would in a pracital scenario be the frame size that would reduce the amount of scheduling time.\n");
 	fflush(outputFile);
-	//
+	
 
 	// Even if multiple frame sizes are possible, the largest valid one will be chosen as that is the one which will lead to the least number of scheduling points. 
 	// Though in this simulation the scheduling time is taken as zero, in all practical applications its not. 
@@ -147,7 +144,6 @@ periodicTaskDriver(int argc, char **argv)
 		free(frames[i].jobs);
 	}
 	free(frames);
-
 	// Not freeing tasks (Task *) as it will be used later.
 	
 	return 0;

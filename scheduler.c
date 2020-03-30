@@ -354,6 +354,7 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 	fprintf(outputFile, "-----------------------------------\n");
 	fprintf(outputFile, "Scheduler running now.\n");
 	fprintf(outputFile, "Frame size: %d, No of frames: %d\n", frameSize, numFrames);
+	fprintf(outputFile, "Disclaimer: The slack may be shown as 0 (because of the granularity, but it might in fact be greater than 0, and hence do something which would only be done when slack is not 0.\n");
 
 	float currentTime = 0; // Refers to the current time wrt to the current frame. Can range between 0 and frameSize.
 	
