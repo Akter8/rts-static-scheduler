@@ -19,6 +19,8 @@ For a given in-phase input task set consisting of periodic tasks [Read the input
 - [ ] Finish the README.
 - [ ] Comments and testing of periodicTaskDriver.c in the 3 checks part.
 - [ ] Test the program with lots of test cases for bugs.
+- [X] Add waiting time output for all jobs.
+- [ ] Static output in another file.
 
 
 ### Tasks Completed

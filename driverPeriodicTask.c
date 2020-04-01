@@ -44,7 +44,7 @@ periodicTaskDriver(int argc, char **argv)
 	printTaskInfo(tasks, numTasks);
 
 
-	fprintf(outputFile, "----------------------------\n");
+	fprintf(outputFile, "----------------------------------------------\n");
 	fflush(outputFile);
 	// Checking the CPU utilisation.
 	checkCpuUtilisation(tasks, numTasks);

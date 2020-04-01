@@ -32,7 +32,7 @@ printTaskInfo(Task *tasks, int numTasks)
 {
 	FILE *outputFile = fopen(OUTPUT_FILE, "a");
 
-	fprintf(outputFile, "----------------------------\n");
+	fprintf(outputFile, "----------------------------------------------\n");
 	fprintf(outputFile, "Task Info\nSorted based on period.\n");
 	fprintf(outputFile, "Num Tasks: %d\n", numTasks);
 	for (int i = 0; i < numTasks; ++i) // Iterates through every task.
@@ -53,7 +53,7 @@ printJobInfo(TaskInstance * jobs, int numJobs)
 {
 	FILE *outputFile = fopen(OUTPUT_FILE, "a");
 
-	fprintf(outputFile, "----------------------------\n");
+	fprintf(outputFile, "----------------------------------------------\n");
 	fprintf(outputFile, "Job Info\n");
 	fprintf(outputFile, "Num Jobs: %d\n", numJobs);
 	for (int i = 0; i < numJobs; ++i) // Iterates thorugh every job.
@@ -77,7 +77,7 @@ printFrameInfo(Frame * frames, int numFrames, int frameSize)
 {
 	FILE *outputFile = fopen(OUTPUT_FILE, "a");
 
-	fprintf(outputFile, "----------------------------\n");
+	fprintf(outputFile, "----------------------------------------------\n");
 	fprintf(outputFile, "Frame Info\n");
 	fprintf(outputFile, "Num Frames: %d\n", numFrames);
 	fprintf(outputFile, "Frame size: %d\n", frameSize);
@@ -146,7 +146,7 @@ printAperiodicJobInfo(AperiodicJob *aperiodicJobs, int numJobs)
 {
 	FILE *outputFile = fopen(OUTPUT_FILE, "a");
 
-	fprintf(outputFile, "----------------------------\n");
+	fprintf(outputFile, "----------------------------------------------\n");
 	fprintf(outputFile, "Aperiodic Job Info\nSorted based on arrival time.\n");
 
 	for (int i = 0; i < numJobs; ++i) // Iterates through the various aperiodic jobs.
@@ -167,7 +167,7 @@ printSporadicJobInfo(SporadicJob *sporadicJobs, int numJobs)
 {
 	FILE *outputFile = fopen(OUTPUT_FILE, "a");
 
-	fprintf(outputFile, "----------------------------\n");
+	fprintf(outputFile, "----------------------------------------------\n");
 	fprintf(outputFile, "Sporadic Job Info\nSorted based on arrival time.\n");
 
 	for (int i = 0; i < numJobs; ++i) // Iterates through the various sporadic jobs.
@@ -188,9 +188,9 @@ printScheduleFrameInfo(ScheduleFrame *framesData, int numFrames)
 {
 	FILE *outputFile = fopen(OUTPUT_FILE, "a");
 
-	fprintf(outputFile, "----------------------------\n");
+	fprintf(outputFile, "----------------------------------------------\n");
 	fprintf(outputFile, "Schedule Frame Info\n");
-	fprintf(outputFile, "NumFrame: %d\n", numFrames);
+	fprintf(outputFile, "NumFrame: %d\n\n", numFrames);
 
 	for (int f = 0; f < numFrames; ++f) // Iterates through the frames.
 	{
@@ -225,7 +225,9 @@ printRunTimeSchedulingInfo(ScheduleFrame *framesData, int numFrames, int frameSi
 	// Create and initialise the response time values.
 	for (int i = 0; i < numTasks; ++i)
 	{
+		// Calloc initialises to 0.
 		tasks[i].responseTimes = (float *) calloc(tasks[i].numInstances, sizeof(float));
+		tasks[i].executionTimes = (float *) calloc(tasks[i].numInstances, sizeof(float));
 	}
 
 	// Find the values of the response times.
@@ -244,6 +246,9 @@ printRunTimeSchedulingInfo(ScheduleFrame *framesData, int numFrames, int frameSi
 					// The value will increase if that instance of the job had been split in to multiple jobs. The split job with the highest response time will become the response time for the overall task instance.
 					if (tasks[k].responseTimes[framesData[i].periodicJobs[j].instanceNum] < framesData[i].periodicJobs[j].responseTime)
 						tasks[k].responseTimes[framesData[i].periodicJobs[j].instanceNum] = framesData[i].periodicJobs[j].responseTime;
+
+					// Updating the values of execution time.
+					tasks[k].executionTimes[framesData[i].periodicJobs[j].instanceNum] += framesData[i].periodicJobs[j].executionTime;
 					break;
 				}
 			}
@@ -269,6 +274,54 @@ printRunTimeSchedulingInfo(ScheduleFrame *framesData, int numFrames, int frameSi
 				max = tasks[i].responseTimes[j];
 
 			avg = avg + tasks[i].responseTimes[j];
+		}
+		fprintf(outputFile, "; Max: %0.1f, Min: %0.1f, Avg: %0.1f\n", max, min, avg / tasks[i].numInstances);
+	}
+	fprintf(outputFile, "\n");
+
+
+	fprintf(outputFile, "Execution Times:\n");
+	// Going through all the execution times of the task instances of that job and also finding min, max and avg.
+	for (int i = 0; i < numTasks; ++i)
+	{
+		fprintf(outputFile, "Execution times of Task-%d with WCET=%0.1f: ", tasks[i].taskNum, tasks[i].wcet);
+		// To find the min, max and avg.
+		float min = FLT_MAX, max = 0, avg = 0;
+		for (int j = 0; j < tasks[i].numInstances; ++j)
+		{
+			fprintf(outputFile, "%0.1f, ", tasks[i].executionTimes[j]);
+
+			if (tasks[i].executionTimes[j] < min)
+				min = tasks[i].executionTimes[j];
+
+			if (tasks[i].executionTimes[j] > max)
+				max = tasks[i].executionTimes[j];
+
+			avg = avg + tasks[i].executionTimes[j];
+		}
+		fprintf(outputFile, "; Max: %0.1f, Min: %0.1f, Avg: %0.1f\n", max, min, avg / tasks[i].numInstances);
+	}
+	fprintf(outputFile, "\n");
+
+
+	fprintf(outputFile, "Waiting Times:\n");
+	// Going through all the waiting times of the task instances of that job and also finding min, max and avg.
+	for (int i = 0; i < numTasks; ++i)
+	{
+		fprintf(outputFile, "Waiting times of Task-%d: ", tasks[i].taskNum);
+		// To find the min, max and avg.
+		float min = FLT_MAX, max = 0, avg = 0;
+		for (int j = 0; j < tasks[i].numInstances; ++j)
+		{
+			fprintf(outputFile, "%0.1f, ", tasks[i].responseTimes[j] - tasks[i].executionTimes[j]);
+
+			if (tasks[i].responseTimes[j] - tasks[i].executionTimes[j] < min)
+				min = tasks[i].responseTimes[j] - tasks[i].executionTimes[j];
+
+			if (tasks[i].responseTimes[j] - tasks[i].executionTimes[j] > max)
+				max = tasks[i].responseTimes[j] - tasks[i].executionTimes[j];
+
+			avg = avg + tasks[i].responseTimes[j] - tasks[i].executionTimes[j];
 		}
 		fprintf(outputFile, "; Max: %0.1f, Min: %0.1f, Avg: %0.1f\n", max, min, avg / tasks[i].numInstances);
 	}
@@ -324,17 +377,19 @@ printRunTimeSchedulingInfo(ScheduleFrame *framesData, int numFrames, int frameSi
 
 
 	// Response times for sporadic jobs that were accepted.
-	fprintf(outputFile, "\nSporadic Job Schedule Info:\n");
-	fprintf(outputFile, "Sporadic jobs that were accepted:\n");
+	fprintf(outputFile, "\n\nSporadic Job Schedule Info:\n");
+
+	fprintf(outputFile, "\nDisclaimer: Sporadic jobs and Aperiodic jobs do not show execution time as the time they execute for is the same as the inputted value.\n");
+	fprintf(outputFile, "Sporadic jobs that were accepted (list may be empty):\n");
 	for (int i = 0; i < numSporadicJobs; ++i)
 	{
 		if (sporadicJobs[i].accepted  && !sporadicJobs[i].rejected)
-			fprintf(outputFile, "S%d completed with a response time: %0.1f\n", sporadicJobs[i].jobNum, sporadicJobs[i].responseTime);
+			fprintf(outputFile, "S%d completed with response time: %0.1f and waiting time: %0.1f\n", sporadicJobs[i].jobNum, sporadicJobs[i].responseTime, sporadicJobs[i].arrivalTime + sporadicJobs[i].responseTime - sporadicJobs[i].wcet);
 	}
 	fprintf(outputFile, "\n");
 
 	// Lists the sporadic jobs that were rejected.
-	fprintf(outputFile, "Sporadic jobs that were rejected: ");
+	fprintf(outputFile, "Sporadic jobs that were rejected (list may be empty): ");
 	for (int i = 0; i < numSporadicJobs; ++i)
 	{
 		if (!sporadicJobs[i].accepted  && sporadicJobs[i].rejected)
@@ -345,16 +400,16 @@ printRunTimeSchedulingInfo(ScheduleFrame *framesData, int numFrames, int frameSi
 
 	// Response times for aperiodic jobs that finished.
 	// Also lists aperiodic jobs that couldn't finish.
-	fprintf(outputFile, "\nAperiodic Job Schedule Info:\n");
+	fprintf(outputFile, "\n\nAperiodic Job Schedule Info:\n");
 	for (int i = 0; i < numAperiodicJobs; ++i)
 	{
 		if (!aperiodicJobs[i].alive && aperiodicJobs[i].timeLeft == 0)
-			fprintf(outputFile, "A%d has finished. Response time: %0.1f\n", aperiodicJobs[i].jobNum, aperiodicJobs[i].responseTime);
+			fprintf(outputFile, "A%d has finished. Response time: %0.1f, Waiting time: %0.1f\n", aperiodicJobs[i].jobNum, aperiodicJobs[i].responseTime, aperiodicJobs[i].responseTime + aperiodicJobs[i].arrivalTime - aperiodicJobs[i].wcet);
 		else
 			fprintf(outputFile, "A%d could NOT finish.\n", aperiodicJobs[i].jobNum);
 	}
 
-
+	fprintf(outputFile, "\n");
 	fclose(outputFile);
 	return;
 }

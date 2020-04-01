@@ -19,6 +19,7 @@ typedef struct
 	float wcet;
 	int numInstances;
 	float *responseTimes;
+	float *executionTimes;
 }
 Task;
 

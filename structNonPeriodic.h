@@ -61,6 +61,7 @@ typedef struct
 	bool alive;
 	float finishTime;
 	float responseTime;
+	float executionTime;
 }
 PeriodicJob;
 

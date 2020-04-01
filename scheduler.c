@@ -64,6 +64,7 @@ runAperiodic(AperiodicJob *aperiodicJobs, int numJobs, int *jobIndex, float maxE
 	float timeExecuted = 0;
 	while (timeExecuted < maxExecutionTime) // Execute only when we have some slack.
 	{
+		fprintf(outputFile, "Aperiodic Job: A%d timeLeft=%0.1f before running.\n", aperiodicJobs[*jobIndex].jobNum, aperiodicJobs[*jobIndex].timeLeft);
 		float timeLeft = maxExecutionTime - timeExecuted; // Max time left to run these.
 		float minTime = (aperiodicJobs[*jobIndex].timeLeft < timeLeft) ? aperiodicJobs[*jobIndex].timeLeft : timeLeft; // We can only execute this job either till it finishes, or till our slack is over. whichever is min.
 
@@ -72,10 +73,10 @@ runAperiodic(AperiodicJob *aperiodicJobs, int numJobs, int *jobIndex, float maxE
 		aperiodicJobs[*jobIndex].timeLeft -= minTime;
 
 		// Increment number of preemptions.
-		if (aperiodicJobs[*jobIndex].timeLeft >= timeLeft)
+		if (aperiodicJobs[*jobIndex].timeLeft > timeLeft)
 		{
 			numPreemptions++;
-			fprintf(outputFile, "Aperiodic Job: A%d being preempted.\n", aperiodicJobs[*jobIndex].jobNum);
+			fprintf(outputFile, "Aperiodic Job: A%d being preempted. TimeLeft=%0.1f\n", aperiodicJobs[*jobIndex].jobNum, aperiodicJobs[*jobIndex].timeLeft);
 		}
 
 		if (aperiodicJobs[*jobIndex].timeLeft == 0)	// If the current job is done.
@@ -123,7 +124,7 @@ runSporadic(SporadicJob *sporadicJobs, int numJobs, int *jobIndex, float maxExec
 
 	while (timeExecuted < maxExecutionTime) // Execute only when we have some slack.
 	{
-		fprintf(outputFile, "Sporadic Job: S%d timeLeft=%0.1f\n", sporadicJobs[*jobIndex].jobNum, sporadicJobs[*jobIndex].timeLeft);
+		fprintf(outputFile, "Sporadic Job: S%d timeLeft=%0.1f before running.\n", sporadicJobs[*jobIndex].jobNum, sporadicJobs[*jobIndex].timeLeft);
 		float timeLeft = maxExecutionTime - timeExecuted; // Finding the time left.
 		float minTime = (sporadicJobs[*jobIndex].timeLeft < timeLeft) ? sporadicJobs[*jobIndex].timeLeft : timeLeft; // We can only execute this job either till it finishes, or till our slack is over. whichever is min.
 		// fprintf(outputFile, "minTime = %0.1f\n", minTime);
@@ -134,10 +135,10 @@ runSporadic(SporadicJob *sporadicJobs, int numJobs, int *jobIndex, float maxExec
 
 
 		// Increment number of preemptions.
-		if (sporadicJobs[*jobIndex].timeLeft >= timeLeft)
+		if (sporadicJobs[*jobIndex].timeLeft > timeLeft)
 		{
 			numPreemptions++;
-			fprintf(outputFile, "Sporadic Job: S%d being preempted.\n", sporadicJobs[*jobIndex].jobNum);
+			fprintf(outputFile, "Sporadic Job: S%d being preempted. TimeLeft=%0.1f\n", sporadicJobs[*jobIndex].jobNum, sporadicJobs[*jobIndex].timeLeft);
 		}
 
 
@@ -351,7 +352,7 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 
 	FILE *outputFile = fopen(OUTPUT_FILE, "a");
 
-	fprintf(outputFile, "-----------------------------------\n");
+	fprintf(outputFile, "----------------------------------------------\n");
 	fprintf(outputFile, "Scheduler running now.\n");
 	fprintf(outputFile, "Frame size: %d, No of frames: %d\n", frameSize, numFrames);
 	fprintf(outputFile, "Disclaimer: The slack may be shown as 0 (because of the granularity, but it might in fact be greater than 0, and hence do something which would only be done when slack is not 0.\n");
@@ -442,7 +443,8 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 				// If sporadic job exists, execute it.
 				if (acceptedSporadicIndex != -1)
 				{
-					fprintf(outputFile, "Sporadic jobs running. Job = S%d.\n", acceptedSporadicJobs[acceptedSporadicIndex].jobNum);
+					fprintf(outputFile, "\nSporadic jobs running. First Job = S%d.\n", acceptedSporadicJobs[acceptedSporadicIndex].jobNum);
+					fflush(outputFile);
 
 					runTime = runSporadic(acceptedSporadicJobs, numSporadicJobsAtPresent, &acceptedSporadicIndex, framesData[f].slack, currentTime, f, frameSize);
 
@@ -467,10 +469,12 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 				if (aperiodicCheck)
 				{
 					fprintf(outputFile, "Aperiodic jobs executing.\n");
+					fflush(outputFile);
+
 					runTime = runAperiodic(aperiodicJobs, numAperiodicJobs, &aperiodicIndex, framesData[f].slack, currentTime, f, frameSize);
 					framesData[f].slack -= runTime;
 					currentTime += runTime;
-					fflush(outputFile);
+
 					if (runTime != 0)
 						continue;
 				}
@@ -486,11 +490,12 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 				{
 					runTime = runPeriodic(framesData[f].periodicJobs[periodicJobIndex]);
 
-					fprintf(outputFile, "Slack before periodic job: %0.1f\n", framesData[f].slack);
+					fprintf(outputFile, "\nSlack before periodic job: %0.1f\n", framesData[f].slack);
 					fprintf(outputFile, "Periodic Job: J%d with instance: %d, and wcet=%0.1f running from %0.1f to %0.1f\n", framesData[f].periodicJobs[periodicJobIndex].taskNum, framesData[f].periodicJobs[periodicJobIndex].instanceNum, framesData[f].periodicJobs[periodicJobIndex].wcet, currentTime + (f * frameSize), currentTime + (f * frameSize) + runTime);
 
 					// Update the DS about the execution.
 					framesData[f].periodicJobs[periodicJobIndex].finishTime = currentTime + (f * frameSize) + runTime;
+					framesData[f].periodicJobs[periodicJobIndex].executionTime = runTime;
 					framesData[f].periodicJobs[periodicJobIndex].alive = false;
 					framesData[f].slack += (framesData[f].periodicJobs[periodicJobIndex].wcet - runTime);
 
@@ -513,6 +518,7 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 				else
 				{
 					fprintf(outputFile, "Idle till the end of the frame.\n");
+					fflush(outputFile);
 
 					currentTime = frameSize;
 					continue;
@@ -542,7 +548,7 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 				{
 					runTime = runPeriodic(framesData[f].periodicJobs[periodicJobIndex]);
 					framesData[f].periodicJobs[periodicJobIndex].alive = false;
-					fprintf(outputFile, "Slack before periodic job: %0.1f\n", framesData[f].slack);
+					fprintf(outputFile, "\nSlack before periodic job: %0.1f\n", framesData[f].slack);
 
 					// Updating slack.
 					framesData[f].slack += (framesData[f].periodicJobs[periodicJobIndex].wcet - runTime);
@@ -553,6 +559,7 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 					fflush(outputFile);
 
 					framesData[f].periodicJobs[periodicJobIndex].finishTime = currentTime + (f * frameSize) + runTime;
+					framesData[f].periodicJobs[periodicJobIndex].executionTime = runTime;
 
 					currentTime += runTime;
 					periodicJobIndex++;
@@ -563,7 +570,8 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 				// Else if sporadic jobs exist, execute them.
 				else if (acceptedSporadicIndex != -1)
 				{
-					fprintf(outputFile, "Sporadic jobs running. Job = S%d.\n", acceptedSporadicJobs[acceptedSporadicIndex].jobNum);
+					fprintf(outputFile, "\nSporadic jobs running. First Job = S%d.\n", acceptedSporadicJobs[acceptedSporadicIndex].jobNum);
+					fflush(outputFile);
 
 					runTime = runSporadic(acceptedSporadicJobs, numSporadicJobsAtPresent, &acceptedSporadicIndex, frameSize - currentTime, currentTime, f, frameSize);
 					// Not updating slack as this was a scheduled execution.
@@ -620,7 +628,7 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 	}
 
 	// After all frames are done being scheduled.
-	fprintf(outputFile, "\n\nFinished Scheduling.\n----------------------------\n");
+	fprintf(outputFile, "\n\nFinished Scheduling.\n----------------------------------------------\n");
 	fclose(outputFile);
 
 	return;
