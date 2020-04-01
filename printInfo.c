@@ -23,6 +23,10 @@
 extern Task *tasks;
 extern int numTasks;
 
+extern int numPreemptions;
+extern int numCacheImpactPoints;
+extern int numContinuousPeriodicJobsOfSameTask;
+
 
 /*
  * Prints Task information onto the output file.
@@ -184,9 +188,9 @@ printSporadicJobInfo(SporadicJob *sporadicJobs, int numJobs)
  * Prints the frame info after reading from the file.
  */
 void
-printScheduleFrameInfo(ScheduleFrame *framesData, int numFrames)
+printScheduleFrameInfo(ScheduleFrame *framesData, int numFrames, char *fileName)
 {
-	FILE *outputFile = fopen(OUTPUT_FILE, "a");
+	FILE *outputFile = fopen(fileName, "a");
 
 	fprintf(outputFile, "----------------------------------------------\n");
 	fprintf(outputFile, "Schedule Frame Info\n");
@@ -255,8 +259,9 @@ printRunTimeSchedulingInfo(ScheduleFrame *framesData, int numFrames, int frameSi
 		}
 	}
 
-	fprintf(outputFile, "Periodic Task Schedule Info:\n");
-	fprintf(outputFile, "Response Times:\n");
+	fprintf(outputFile, "\nJob Info after running the task set.\n");
+	fprintf(outputFile, "\nPeriodic Task Schedule Info:\n");
+	fprintf(outputFile, "\nResponse Times:\n");
 	// Going through all the response times of the task instances of that job and also finding min, max and avg.
 	for (int i = 0; i < numTasks; ++i)
 	{
@@ -411,5 +416,30 @@ printRunTimeSchedulingInfo(ScheduleFrame *framesData, int numFrames, int frameSi
 
 	fprintf(outputFile, "\n");
 	fclose(outputFile);
+	return;
+}
+
+
+
+/*
+ * Prints the data about the number of preemption points and cache impact points.
+ */
+void
+printPreemptionInfo()
+{
+	FILE *outputFile = fopen(OUTPUT_FILE, "a");
+	fprintf(outputFile, "------------------------------------------------\n");
+	fprintf(outputFile, "\nPreemption Data\n\n");
+
+	fprintf(outputFile, "Disclaimer: Number of preemption points will only calculate the non-periodic jobs that were preempted as periodic jobs are not preempted.\n\n");
+	fprintf(outputFile, "Number of preemptions while executing sporadic and aperiodic jobs: %d\n\n", numPreemptions);
+	fprintf(outputFile, "Disclaimer: The number of cache impact points counts the number of points in the schedule where a preemption/context swtich resulted in cache impact. It will not count a point in the schedule in which two periodic jobs of the same jobs run one after the other as the instr cache and most of the data cache will remain the same.\n");
+	fprintf(outputFile, "Disclaimer: The number of cache impact points also contains the number of preemption points of non-periodic jobs.\n");
+	fprintf(outputFile, "Number of cache impact points: %d\n", numCacheImpactPoints);
+	fprintf(outputFile, "Number of points where the periodic job of the same task is running one after the other: %d\n\n", numContinuousPeriodicJobsOfSameTask);
+
+
+	fclose(outputFile);
+
 	return;
 }

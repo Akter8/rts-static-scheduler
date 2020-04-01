@@ -5,3 +5,5 @@
 #define SPORADIC_JOB_FILE "sporadicJobs.txt"
 
 #define FRAME_INFO_FILE "periodicSchedule.txt"
+
+#define FRAME_INFO_HUMAN_READABLE_FILE "periodicSchedule_humanReadable.txt"

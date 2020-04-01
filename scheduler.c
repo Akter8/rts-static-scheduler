@@ -17,6 +17,8 @@
 #include "configuration.h"
 
 extern int numPreemptions;
+extern int numCacheImpactPoints;
+extern int numContinuousPeriodicJobsOfSameTask;
 
 
 /*
@@ -367,6 +369,10 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 	if (numAperiodicJobs > 0)
 		aperiodicIndex = 0;
 
+	// To find the number of cache impact points.
+	// -1 if aperiodic/sporadic, else task num.
+	int previousJobTaskNum = -1;
+
 	// Initialising the seed before the jobs start executing.
 	srand(time(NULL));
 
@@ -457,6 +463,7 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 						framesData[f].slack -= runTime;
 
 					currentTime += runTime;
+					previousJobTaskNum = -1;
 					continue;
 				}
 
@@ -474,6 +481,7 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 					runTime = runAperiodic(aperiodicJobs, numAperiodicJobs, &aperiodicIndex, framesData[f].slack, currentTime, f, frameSize);
 					framesData[f].slack -= runTime;
 					currentTime += runTime;
+					previousJobTaskNum = -1;
 
 					if (runTime != 0)
 						continue;
@@ -488,6 +496,12 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 				// fprintf(outputFile, "not aperiodic\n");
 				if (periodicJobIndex < framesData[f].numPeriodicJobs)
 				{
+					// If the previous job that ran is from the same task, then it will not be a cache impact point.
+					if (previousJobTaskNum == framesData[f].periodicJobs[periodicJobIndex].taskNum)
+						numContinuousPeriodicJobsOfSameTask++;
+					else
+						numCacheImpactPoints++;
+
 					runTime = runPeriodic(framesData[f].periodicJobs[periodicJobIndex]);
 
 					fprintf(outputFile, "\nSlack before periodic job: %0.1f\n", framesData[f].slack);
@@ -502,6 +516,7 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 					fprintf(outputFile, "Slack after periodic job: %0.1f\n\n", framesData[f].slack);
 					fflush(outputFile);
 
+					previousJobTaskNum = framesData[f].periodicJobs[periodicJobIndex].taskNum;
 					periodicJobIndex++;
 					currentTime += runTime;
 
@@ -529,6 +544,7 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 					fprintf(outputFile, "Idle from %0.1f to %0.1f\n", currentTime, nextAperiodicJobArrivalTime - (f * frameSize));
 					currentTime = nextAperiodicJobArrivalTime - (f * frameSize);
 					fflush(outputFile);
+					previousJobTaskNum = -1;
 					continue;
 				}
 				// If no, sleep till the end of the frame.
@@ -546,6 +562,12 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 				// If periodic jobs exist, execute them.
 				if (periodicJobIndex < framesData[f].numPeriodicJobs)
 				{
+					// If the previous job that ran is from the same task, then it will not be a cache impact point.
+					if (previousJobTaskNum == framesData[f].periodicJobs[periodicJobIndex].taskNum)
+						numContinuousPeriodicJobsOfSameTask++;
+					else
+						numCacheImpactPoints++;
+
 					runTime = runPeriodic(framesData[f].periodicJobs[periodicJobIndex]);
 					framesData[f].periodicJobs[periodicJobIndex].alive = false;
 					fprintf(outputFile, "\nSlack before periodic job: %0.1f\n", framesData[f].slack);
@@ -561,6 +583,7 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 					framesData[f].periodicJobs[periodicJobIndex].finishTime = currentTime + (f * frameSize) + runTime;
 					framesData[f].periodicJobs[periodicJobIndex].executionTime = runTime;
 
+					previousJobTaskNum = framesData[f].periodicJobs[periodicJobIndex].taskNum;
 					currentTime += runTime;
 					periodicJobIndex++;
 
@@ -581,6 +604,7 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 					fflush(outputFile);
 
 					currentTime += runTime;
+					previousJobTaskNum = -1;
 					
 					continue;
 				}
@@ -630,6 +654,9 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 	// After all frames are done being scheduled.
 	fprintf(outputFile, "\n\nFinished Scheduling.\n----------------------------------------------\n");
 	fclose(outputFile);
+
+	// The number of cache impact points should also contain the number of sporadic and aperiodic job preemptions.
+	numCacheImpactPoints += numPreemptions;
 
 	return;
 }

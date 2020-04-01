@@ -23,8 +23,9 @@ void mergeSporadicJobsOnEDF(SporadicJob *, int, int, int);
 // Prints the data structures onto the output file. (printInfo.c)
 void printAperiodicJobInfo(AperiodicJob *, int);
 void printSporadicJobInfo(SporadicJob *, int);
-void printScheduleFrameInfo(ScheduleFrame *, int);
+void printScheduleFrameInfo(ScheduleFrame *, int, char *);
 void printRunTimeSchedulingInfo(ScheduleFrame *, int, int, AperiodicJob *, int, SporadicJob *, int);
+void printPreemptionInfo();
 
 // The scheduler module (scheduler.c)
 bool checkAperiodicJob(AperiodicJob *, int, float);

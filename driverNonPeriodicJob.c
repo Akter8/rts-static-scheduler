@@ -24,6 +24,8 @@ extern SporadicJob *sporadicJobs;
 extern ScheduleFrame *framesData;
 
 int numPreemptions = 0;
+int numCacheImpactPoints = 0;
+int numContinuousPeriodicJobsOfSameTask = 0;
 
 
 int
@@ -66,23 +68,20 @@ nonPeriodicJobDriver()
 	// Print the data onto the output file.
 	printAperiodicJobInfo(aperiodicJobs, numAperiodicJobs);
 	printSporadicJobInfo(sporadicJobs, numSporadicJobs);
-	printScheduleFrameInfo(framesData, numFrames);
+	printScheduleFrameInfo(framesData, numFrames, OUTPUT_FILE);
+
+	// Prints data onto the static schedule data file.
+	printScheduleFrameInfo(framesData, numFrames, FRAME_INFO_HUMAN_READABLE_FILE);
 
 
 	// Start the scheduler.
 	scheduler(framesData, numFrames, frameSize, aperiodicJobs, numAperiodicJobs, sporadicJobs, numSporadicJobs);
-
-	FILE *outputFile = fopen(OUTPUT_FILE, "a");
-	fprintf(outputFile, "Number of preemptions: %d\n\n", numPreemptions);
-	fflush(outputFile);
 	
 
 	// Prints the run time scheduler information about all types of jobs.
 	printRunTimeSchedulingInfo(framesData, numFrames, frameSize, aperiodicJobs, numAperiodicJobs, sporadicJobs, numSporadicJobs);
 
-
-	// Cleaning up memory before program exiting.
-	fclose(outputFile);
+	printPreemptionInfo();
 
 	// Free the data.
 	free(aperiodicJobs);
@@ -95,6 +94,7 @@ nonPeriodicJobDriver()
 	for (int i = 0; i < numTasks; ++i)
 	{
 		free(tasks[i].responseTimes);
+		free(tasks[i].executionTimes);
 	}
 	free(tasks);
 

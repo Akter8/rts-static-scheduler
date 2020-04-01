@@ -19,8 +19,8 @@ For a given in-phase input task set consisting of periodic tasks [Read the input
 - [ ] Finish the README.
 - [ ] Comments and testing of periodicTaskDriver.c in the 3 checks part.
 - [ ] Test the program with lots of test cases for bugs.
-- [X] Add waiting time output for all jobs.
-- [ ] Static output in another file.
+- [X] Add waiting time output for all jobs - added waiting time and execution time.
+- [X] Static output in another file - added periodicSchedule_humanReadable.txt
 
 
 ### Tasks Completed
@@ -68,6 +68,7 @@ For a given in-phase input task set consisting of periodic tasks [Read the input
 #### Once the program is run
 * outputFile (variable in the Makefile) - The output file.
 * periodicSchedule.txt - The file containing the information about every frame and the periodic tasks in them.
+* periodicSchedule_humanReadable.txt - The file containing information about the frame data (static schedule) in a human readable format.
 
 
 

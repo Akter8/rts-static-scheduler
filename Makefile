@@ -4,6 +4,7 @@ flags = -c
 executableName = test
 driver = driverMain
 intermediateOutputFile = periodicSchedule.txt
+staticOutputHumanReadableFile = periodicSchedule_humanReadable.txt
 outputFile = outputFile.txt
 
 
@@ -47,4 +48,4 @@ utilityFunctions.o: utilityFunctions.c
 
 # To remove all .o files and to clean the directory.
 clean:
-	rm -f *.o $(executableName) $(outputFile) $(intermediateOutputFile)
+	rm -f *.o $(executableName) $(outputFile) $(intermediateOutputFile) $(staticOutputHumanReadableFile)
