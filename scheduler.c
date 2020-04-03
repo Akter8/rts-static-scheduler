@@ -20,6 +20,8 @@ extern int numPreemptions;
 extern int numCacheImpactPoints;
 extern int numContinuousPeriodicJobsOfSameTask;
 
+extern FILE *outputFile;
+
 
 /*
  * Checks whether if there is an aperiodic job alive to be able to run
@@ -59,8 +61,6 @@ runAperiodic(AperiodicJob *aperiodicJobs, int numJobs, int *jobIndex, float maxE
 		return 0;
 	}
 
-	FILE *outputFile = fopen(OUTPUT_FILE, "a");
-
 	fprintf(outputFile, "Running Aperiodic Jobs from %0.1f to %0.1f\n", currentTime + (currentFrame *frameSize), maxExecutionTime + currentTime + (currentFrame *frameSize));
 
 	float timeExecuted = 0;
@@ -99,7 +99,6 @@ runAperiodic(AperiodicJob *aperiodicJobs, int numJobs, int *jobIndex, float maxE
 		if (*jobIndex == -1)
 			break;
 	}
-	fclose(outputFile);
 
 	return timeExecuted;
 }
@@ -117,8 +116,6 @@ runSporadic(SporadicJob *sporadicJobs, int numJobs, int *jobIndex, float maxExec
 	// Checking if all sporadic jobs are already done.
 	if (*jobIndex == -1)
 		return 0;
-
-	FILE *outputFile = fopen(OUTPUT_FILE, "a");
 
 	fprintf(outputFile, "Running sporadicJobs for the next %0.1f units if possible.\n", maxExecutionTime);
 
@@ -161,7 +158,6 @@ runSporadic(SporadicJob *sporadicJobs, int numJobs, int *jobIndex, float maxExec
 		if (*jobIndex == -1)
 			break;
 	}
-	fclose(outputFile);
 
 	return timeExecuted;
 }
@@ -208,8 +204,6 @@ SporadicJob
 		Else reject it.
 	End 
 	*/
-
-	FILE *outputFile = fopen(OUTPUT_FILE, "a");
 
 	fprintf(outputFile, "Finding sporadicJobs in this frame.\n");
 	int jobsThisFrame = 0;
@@ -301,7 +295,6 @@ SporadicJob
 	fprintf(outputFile, "Reducing slack by: %0.1f\n", *reduceSlackBy);
 	*numJobsThisFrame = jobsThisFrame;
 	sporadicJobsThisFrame = realloc(sporadicJobsThisFrame, sizeof(SporadicJob) * jobsThisFrame);
-	fclose(outputFile);
 
 
 	return sporadicJobsThisFrame;
@@ -351,8 +344,6 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 					set slack = time left in the frame.
 	end
 	*/
-
-	FILE *outputFile = fopen(OUTPUT_FILE, "a");
 
 	fprintf(outputFile, "----------------------------------------------\n");
 	fprintf(outputFile, "Scheduler running now.\n");
@@ -653,7 +644,6 @@ scheduler(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob 
 
 	// After all frames are done being scheduled.
 	fprintf(outputFile, "\n\nFinished Scheduling.\n----------------------------------------------\n");
-	fclose(outputFile);
 
 	// The number of cache impact points should also contain the number of sporadic and aperiodic job preemptions.
 	numCacheImpactPoints += numPreemptions;

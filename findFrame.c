@@ -15,6 +15,8 @@
 #include "functionPeriodic.h"
 #include "configuration.h"
 
+extern FILE *outputFile;
+
 
 
 /*
@@ -33,8 +35,6 @@ splitJobs(TaskInstance job, Frame *frames, int numFrames)
 	
 	End
 	*/
-
-	FILE *outputFile = fopen(OUTPUT_FILE, "a");
 
 	float wcet = job.wcet;
 
@@ -118,9 +118,6 @@ splitJobs(TaskInstance job, Frame *frames, int numFrames)
 
 	free(sortedFrames);
 
-	fflush(outputFile);
-	fclose(outputFile);
-
 	return;
 }
 
@@ -163,7 +160,6 @@ findFrame(TaskInstance *jobs, int numJobs, Frame *frames, int frameSize, int num
 	End
 	*/
 
-	FILE *outputFile = fopen(OUTPUT_FILE, "a");
 	fprintf(outputFile, "----------------------------\n");
 	fprintf(outputFile, "Finding frames for all jobs.\n");
 	fprintf(outputFile, "frameSize: %d, NumFrame: %d\n", frameSize, numFrames);
@@ -206,8 +202,6 @@ findFrame(TaskInstance *jobs, int numJobs, Frame *frames, int frameSize, int num
 	{
 		frames[i].jobs = realloc(frames[i].jobs, sizeof(TaskInstance) * frames[i].numJobs);
 	}
-
-	fclose(outputFile);
 
 	return;
 }

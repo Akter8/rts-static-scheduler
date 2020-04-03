@@ -21,6 +21,7 @@ extern int numTasks;
 extern Task* tasks;
 extern TaskInstance *jobs;
 extern Frame *frames;
+extern FILE *outputFile;
 
 
 int
@@ -30,8 +31,6 @@ periodicTaskDriver(int argc, char **argv)
 	// Doing basic checks on the inputs.
 	firstCheck(argc, argv);
 	FILE *periodicJobFile = inputFileCheck(argv[1]);
-
-	FILE *outputFile = fopen(OUTPUT_FILE, "a");
 	
 
 	// Taking in input for periodic tasks.
@@ -130,10 +129,6 @@ periodicTaskDriver(int argc, char **argv)
 	
 	// To store the information about frames into the output file.
 	storeFrameInfo(frames, numFrames, frameSize);
-
-
-	// Closing the file.
-	fclose(outputFile);
 
 	// Freeing data.
 	free(condition2Sizes);

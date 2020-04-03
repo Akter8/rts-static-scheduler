@@ -21,6 +21,8 @@ For a given in-phase input task set consisting of periodic tasks [Read the input
 - [ ] Test the program with lots of test cases for bugs.
 - [X] Add waiting time output for all jobs - added waiting time and execution time.
 - [X] Static output in another file - added periodicSchedule_humanReadable.txt
+- [X] Remove unnecessary fopens.
+- [ ] Remove unnecessary fflushs.
 
 
 ### Tasks Completed

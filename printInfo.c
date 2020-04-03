@@ -27,6 +27,8 @@ extern int numPreemptions;
 extern int numCacheImpactPoints;
 extern int numContinuousPeriodicJobsOfSameTask;
 
+extern FILE *outputFile;
+
 
 /*
  * Prints Task information onto the output file.
@@ -34,8 +36,6 @@ extern int numContinuousPeriodicJobsOfSameTask;
 void
 printTaskInfo(Task *tasks, int numTasks)
 {
-	FILE *outputFile = fopen(OUTPUT_FILE, "a");
-
 	fprintf(outputFile, "----------------------------------------------\n");
 	fprintf(outputFile, "Task Info\nSorted based on period.\n");
 	fprintf(outputFile, "Num Tasks: %d\n", numTasks);
@@ -43,8 +43,6 @@ printTaskInfo(Task *tasks, int numTasks)
 	{
 		fprintf(outputFile, "Task=T%d, period=%d, wcet=%0.1f, deadline=%0.1f\n", tasks[i].taskNum, tasks[i].period, tasks[i].wcet, tasks[i].deadline);
 	}
-
-	fclose(outputFile);
 }
 
 
@@ -55,8 +53,6 @@ printTaskInfo(Task *tasks, int numTasks)
 void
 printJobInfo(TaskInstance * jobs, int numJobs)
 {
-	FILE *outputFile = fopen(OUTPUT_FILE, "a");
-
 	fprintf(outputFile, "----------------------------------------------\n");
 	fprintf(outputFile, "Job Info\n");
 	fprintf(outputFile, "Num Jobs: %d\n", numJobs);
@@ -67,8 +63,6 @@ printJobInfo(TaskInstance * jobs, int numJobs)
 		else
 			fprintf(outputFile, "J%d TaskInstance=%d: startFrame=%d, maxFrame=%d, wcet=%0.1f, alive=%d\n", jobs[i].taskNum, jobs[i].instanceNum, jobs[i].startFrame, jobs[i].maxFrame, jobs[i].wcet, jobs[i].alive);
 	}
-
-	fclose(outputFile);
 }
 
 
@@ -79,8 +73,6 @@ printJobInfo(TaskInstance * jobs, int numJobs)
 void
 printFrameInfo(Frame * frames, int numFrames, int frameSize)
 {
-	FILE *outputFile = fopen(OUTPUT_FILE, "a");
-
 	fprintf(outputFile, "----------------------------------------------\n");
 	fprintf(outputFile, "Frame Info\n");
 	fprintf(outputFile, "Num Frames: %d\n", numFrames);
@@ -98,7 +90,6 @@ printFrameInfo(Frame * frames, int numFrames, int frameSize)
 				fprintf(outputFile, "\tJ%d split=%d instance=%d, wcet=%0.1f\n", frames[f].jobs[i].taskNum, frames[f].jobs[i].splitNum, frames[f].jobs[i].instanceNum, frames[f].jobs[i].wcet);
 		}
 	}
-	fclose(outputFile);
 }
 
 
@@ -148,8 +139,6 @@ storeFrameInfo(Frame *frames, int numFrames, int frameSize)
 void
 printAperiodicJobInfo(AperiodicJob *aperiodicJobs, int numJobs)
 {
-	FILE *outputFile = fopen(OUTPUT_FILE, "a");
-
 	fprintf(outputFile, "----------------------------------------------\n");
 	fprintf(outputFile, "Aperiodic Job Info\nSorted based on arrival time.\n");
 
@@ -157,8 +146,6 @@ printAperiodicJobInfo(AperiodicJob *aperiodicJobs, int numJobs)
 	{
 		fprintf(outputFile, "Job=A%d, ArrivalTime=%0.1f, ExecutionTime=%0.1f\n", aperiodicJobs[i].jobNum, aperiodicJobs[i].arrivalTime, aperiodicJobs[i].wcet);
 	}
-
-	fclose(outputFile);
 }
 
 
@@ -169,8 +156,6 @@ printAperiodicJobInfo(AperiodicJob *aperiodicJobs, int numJobs)
 void
 printSporadicJobInfo(SporadicJob *sporadicJobs, int numJobs)
 {
-	FILE *outputFile = fopen(OUTPUT_FILE, "a");
-
 	fprintf(outputFile, "----------------------------------------------\n");
 	fprintf(outputFile, "Sporadic Job Info\nSorted based on arrival time.\n");
 
@@ -178,8 +163,6 @@ printSporadicJobInfo(SporadicJob *sporadicJobs, int numJobs)
 	{
 		fprintf(outputFile, "Job=S%d, ArrivalTime=%0.1f, ExecutionTime=%0.1f, Deadline=%0.1f, startFrame=%d, maxFrame=%d\n", sporadicJobs[i].jobNum, sporadicJobs[i].arrivalTime, sporadicJobs[i].wcet, sporadicJobs[i].deadline, sporadicJobs[i].startFrame, sporadicJobs[i].maxFrame);
 	}
-
-	fclose(outputFile);
 }
 
 
@@ -190,8 +173,6 @@ printSporadicJobInfo(SporadicJob *sporadicJobs, int numJobs)
 void
 printScheduleFrameInfo(ScheduleFrame *framesData, int numFrames, char *fileName)
 {
-	FILE *outputFile = fopen(fileName, "a");
-
 	fprintf(outputFile, "----------------------------------------------\n");
 	fprintf(outputFile, "Schedule Frame Info\n");
 	fprintf(outputFile, "NumFrame: %d\n\n", numFrames);
@@ -211,8 +192,6 @@ printScheduleFrameInfo(ScheduleFrame *framesData, int numFrames, char *fileName)
 
 		fprintf(outputFile, "\n");
 	}
-
-	fclose(outputFile);
 }
 
 
@@ -224,8 +203,6 @@ printScheduleFrameInfo(ScheduleFrame *framesData, int numFrames, char *fileName)
 void
 printRunTimeSchedulingInfo(ScheduleFrame *framesData, int numFrames, int frameSize, AperiodicJob *aperiodicJobs, int numAperiodicJobs, SporadicJob *sporadicJobs, int numSporadicJobs)
 {
-	FILE *outputFile = fopen(OUTPUT_FILE, "a");
-
 	// Create and initialise the response time values.
 	for (int i = 0; i < numTasks; ++i)
 	{
@@ -415,7 +392,6 @@ printRunTimeSchedulingInfo(ScheduleFrame *framesData, int numFrames, int frameSi
 	}
 
 	fprintf(outputFile, "\n");
-	fclose(outputFile);
 	return;
 }
 
@@ -427,7 +403,6 @@ printRunTimeSchedulingInfo(ScheduleFrame *framesData, int numFrames, int frameSi
 void
 printPreemptionInfo()
 {
-	FILE *outputFile = fopen(OUTPUT_FILE, "a");
 	fprintf(outputFile, "------------------------------------------------\n");
 	fprintf(outputFile, "\nPreemption Data\n\n");
 
@@ -437,9 +412,6 @@ printPreemptionInfo()
 	fprintf(outputFile, "Disclaimer: The number of cache impact points also contains the number of preemption points of non-periodic jobs.\n");
 	fprintf(outputFile, "Number of cache impact points: %d\n", numCacheImpactPoints);
 	fprintf(outputFile, "Number of points where the periodic job of the same task is running one after the other: %d\n\n", numContinuousPeriodicJobsOfSameTask);
-
-
-	fclose(outputFile);
 
 	return;
 }

@@ -14,6 +14,8 @@
 #include "functionPeriodic.h"
 #include "functionNonPeriodic.h"
 
+extern FILE *outputFile;
+
 
 /*
  * Utility function to find GCD of 'a' and 'b'.
@@ -135,9 +137,7 @@ checkCpuUtilisation(Task *tasks, int numTasks)
 	float cpuUtilisation = calculateCpuUtilisation(tasks, numTasks);
 	if (cpuUtilisation <= 1.0f)
 	{
-		FILE *outputFile = fopen(OUTPUT_FILE, "a");
 		fprintf(outputFile, "CPU Utilisation <= 1: might be schedulable.\n");
-		fclose(outputFile);
 	}
 	else
 	{

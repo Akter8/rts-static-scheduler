@@ -25,11 +25,12 @@ AperiodicJob *aperiodicJobs;
 SporadicJob *sporadicJobs;
 ScheduleFrame *framesData;
 
+FILE *outputFile;
+
 int
 main(int argc, char *argv[])
 {
-	FILE *outputFile = fopen(OUTPUT_FILE, "w"); // Opening the output file in write mode so that everything is overwritten.
-	fclose(outputFile);
+	outputFile = fopen(OUTPUT_FILE, "w"); // Opening the output file in write mode so that everything is overwritten.
 
 	// Calling the periodic task part.
 	periodicTaskDriver(argc, argv);
@@ -38,7 +39,6 @@ main(int argc, char *argv[])
 	nonPeriodicJobDriver();
 
 	// Program has finished.
-	outputFile = fopen(OUTPUT_FILE, "a");
 	fprintf(outputFile, "-------------------THE END-------------------\n");
 	fclose(outputFile);
 
