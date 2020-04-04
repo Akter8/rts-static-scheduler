@@ -17,12 +17,7 @@ For a given in-phase input task set consisting of periodic tasks [Read the input
 - [ ] Make the fprintfs in the scheduler neat.
 - [ ] Check if there are any warnings while compiling.
 - [ ] Finish the README.
-- [ ] Comments and testing of periodicTaskDriver.c in the 3 checks part.
 - [ ] Test the program with lots of test cases for bugs.
-- [X] Add waiting time output for all jobs - added waiting time and execution time.
-- [X] Static output in another file - added periodicSchedule_humanReadable.txt
-- [X] Remove unnecessary fopens.
-- [ ] Remove unnecessary fflushs.
 
 
 ### Tasks Completed

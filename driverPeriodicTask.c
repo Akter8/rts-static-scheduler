@@ -55,13 +55,17 @@ periodicTaskDriver(int argc, char **argv)
 
 	// Finding the frame sizes that satisfy the first condition.
 	fprintf(outputFile, "\n");
+	// Single number for the minimum frame size.
 	int condition1Size = frameSizeCondition1(tasks, numTasks);
 	fprintf(outputFile, "Condition-1: %d\n", condition1Size);
 	fflush(outputFile);
 
 	// Finding the frame sizes that satisfy the second condition.
+	// Initially allocating enough memory for all possible sizes. 
 	int *condition2Sizes = (int *) malloc(sizeof(int) * hyperperiod);
+	// Finding the sizes.
 	int reallocSize = frameSizeCondition2(hyperperiod, condition2Sizes);
+	// Reducing the size to which is required.
 	condition2Sizes = realloc(condition2Sizes, sizeof(int) * reallocSize);
 	fprintf(outputFile, "Condition-2: ");
 	int condition1Index1 = -1;
@@ -76,8 +80,11 @@ periodicTaskDriver(int argc, char **argv)
 
 
 	// Finding the frame sizes that satisfy the third condition.
+	// Initially allocating an upper bound of memory.
 	int *condition3Sizes = (int *) malloc(sizeof(int) * reallocSize);
+	// Finding the frame sizes that fit.
 	reallocSize = frameSizeCondition3(condition2Sizes, tasks, reallocSize, numTasks, condition3Sizes);
+	// Reducing the unnecessary memory size.
 	condition3Sizes = realloc(condition3Sizes, sizeof(int) * reallocSize);
 	int condition1Index2 = -1;
 	fprintf(outputFile, "Condition-3: ");

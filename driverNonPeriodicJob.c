@@ -68,7 +68,6 @@ nonPeriodicJobDriver()
 	// Print the data onto the output file.
 	printAperiodicJobInfo(aperiodicJobs, numAperiodicJobs);
 	printSporadicJobInfo(sporadicJobs, numSporadicJobs);
-	printScheduleFrameInfo(framesData, numFrames, OUTPUT_FILE);
 
 	// Prints data onto the static schedule data file.
 	printScheduleFrameInfo(framesData, numFrames, FRAME_INFO_HUMAN_READABLE_FILE);

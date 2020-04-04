@@ -14,6 +14,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <float.h>
+#include <string.h>
 
 #include "functionPeriodic.h"
 #include "functionNonPeriodic.h"
@@ -168,11 +169,13 @@ printSporadicJobInfo(SporadicJob *sporadicJobs, int numJobs)
 
 
 /*
- * Prints the frame info after reading from the file.
+ * Prints the frame info into the given file after reading from the file that was created by the periodic part.
  */
 void
 printScheduleFrameInfo(ScheduleFrame *framesData, int numFrames, char *fileName)
 {
+	FILE *outputFile = fopen(fileName, "w");
+
 	fprintf(outputFile, "----------------------------------------------\n");
 	fprintf(outputFile, "Schedule Frame Info\n");
 	fprintf(outputFile, "NumFrame: %d\n\n", numFrames);
@@ -192,6 +195,10 @@ printScheduleFrameInfo(ScheduleFrame *framesData, int numFrames, char *fileName)
 
 		fprintf(outputFile, "\n");
 	}
+
+	fclose(outputFile);
+
+	return;
 }
 
 
