@@ -264,7 +264,7 @@ printRunTimeSchedulingInfo(ScheduleFrame *framesData, int numFrames, int frameSi
 
 			avg = avg + tasks[i].responseTimes[j];
 		}
-		fprintf(outputFile, "; Max: %0.1f, Min: %0.1f, Avg: %0.1f\n", max, min, avg / tasks[i].numInstances);
+		fprintf(outputFile, "\n\t(Max: %0.1f, Min: %0.1f, Avg: %0.1f)\n", max, min, avg / tasks[i].numInstances);
 	}
 	fprintf(outputFile, "\n");
 
@@ -288,7 +288,7 @@ printRunTimeSchedulingInfo(ScheduleFrame *framesData, int numFrames, int frameSi
 
 			avg = avg + tasks[i].executionTimes[j];
 		}
-		fprintf(outputFile, "; Max: %0.1f, Min: %0.1f, Avg: %0.1f\n", max, min, avg / tasks[i].numInstances);
+		fprintf(outputFile, "\n\t(Max: %0.1f, Min: %0.1f, Avg: %0.1f)\n", max, min, avg / tasks[i].numInstances);
 	}
 	fprintf(outputFile, "\n");
 
@@ -312,7 +312,7 @@ printRunTimeSchedulingInfo(ScheduleFrame *framesData, int numFrames, int frameSi
 
 			avg = avg + tasks[i].responseTimes[j] - tasks[i].executionTimes[j];
 		}
-		fprintf(outputFile, "; Max: %0.1f, Min: %0.1f, Avg: %0.1f\n", max, min, avg / tasks[i].numInstances);
+		fprintf(outputFile, "\n\t(Max: %0.1f, Min: %0.1f, Avg: %0.1f)\n", max, min, avg / tasks[i].numInstances);
 	}
 	fprintf(outputFile, "\n");
 

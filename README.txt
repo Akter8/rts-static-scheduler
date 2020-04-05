@@ -59,9 +59,11 @@ For a given in-phase input task set consisting of periodic tasks [Read the input
 * utilityFunctions.c - Some utility functions.
 * printInfo.c - Prints the data in the ADTs and the scheduling information onto the output file.
 * scheduler.c - The module associated with the scheduling of periodic + non-periodic jobs
+
 #### Once the program is compiled
 * executableName (variable in the Makefile) - The final executable.
 * .o files for all .c files 
+
 #### Once the program is run
 * outputFile (variable in the Makefile) - The output file.
 * periodicSchedule.txt - The file containing the information about every frame and the periodic tasks in them.
@@ -96,6 +98,7 @@ For a given in-phase input task set consisting of periodic tasks [Read the input
 		10	3.5	10
 		20	0.9	20
 	We could get away with splitting jobs of T2 into 4. But the INF algorithm might choose to split T2 into 3 and T3 into 2.
+13. This simulation does not consider any I/O operations or any voluntary suspensions by any jobs which is not the norm in the real world systems.
 
 
 
@@ -113,6 +116,3 @@ Please change the input files according to convenience and in the right format.
 1. periodicTasks.txt (CLI argument): First line should have the number of tasks in the task set. Subsequent lines should have 3 integers- period, wcet and relative deadline respectively.
 2. APERIODIC_JOB_FILE: First line should have the number of tasks in the task set. Subsequent lines should have 2 integers- arrival time and execution time respectively.
 3. SPORADIC_JOB_FILE: First line should have the number of tasks in the task set. Subsequent lines should have 3 integers- arrival time, execution time and absolute deadline respectively.
-
-
-### Known bugs

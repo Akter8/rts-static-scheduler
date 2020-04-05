@@ -218,7 +218,7 @@ SporadicJob
 	{
 		if (sporadicJobs[i].alive && sporadicJobs[i].accepted && !sporadicJobs[i].rejected && sporadicJobs[i].startFrame <= frameNum && sporadicJobs[i].maxFrame > frameNum)
 		{	
-			fprintf(outputFile, "Adding sporadic job: S%d\n", sporadicJobs[i].jobNum);
+			fprintf(outputFile, "Sporadic Job: Adding sporadic job: S%d\n", sporadicJobs[i].jobNum);
 			sporadicJobsThisFrame[index++] = sporadicJobs[i];
 			*reduceSlackBy += ((sporadicJobs[i].timeLeft < slack - *reduceSlackBy) ? sporadicJobs[i].timeLeft : slack -*reduceSlackBy);
 			jobsThisFrame++;
@@ -246,7 +246,7 @@ SporadicJob
 
 			if (countSlack < sporadicJobs[i].wcet)	// Rejecting after condition-1.
 			{
-				fprintf(outputFile, "Rejected Sporadic job %d\n", sporadicJobs[i].jobNum);
+				fprintf(outputFile, "Sporadic Job: Rejected Sporadic job S%d\n", sporadicJobs[i].jobNum);
 				sporadicJobs[i].rejected = true;
 				sporadicJobs[i].accepted = false;
 				continue;
@@ -269,14 +269,14 @@ SporadicJob
 
 			if (countSlack - acceptedTime < sporadicJobs[i].wcet) // If rejected after condition-2.
 			{
-				fprintf(outputFile, "Rejected Sporadic job %d\n", sporadicJobs[i].jobNum);
+				fprintf(outputFile, "Sporadic Job: Rejected Sporadic job S%d\n", sporadicJobs[i].jobNum);
 				sporadicJobs[i].rejected = true;
 				sporadicJobs[i].accepted = false;
 				continue;
 			}
 			else // Else if accepted after both condition checks.
 			{
-				fprintf(outputFile, "Accepted Sporadic job: S%d\n", sporadicJobs[i].jobNum);
+				fprintf(outputFile, "Sporadic Job: Accepted Sporadic job: S%d\n", sporadicJobs[i].jobNum);
 				sporadicJobs[i].accepted = true;
 				sporadicJobs[i].rejected = false;
 				*reduceSlackBy += ((sporadicJobs[i].timeLeft < slack - *reduceSlackBy) ? sporadicJobs[i].timeLeft : slack -*reduceSlackBy);
@@ -291,8 +291,8 @@ SporadicJob
 	if (jobsThisFrame == 0)
 		*reduceSlackBy = 0;
 
-	fprintf(outputFile, "Sporadic jobsThisFrame: %d\n", jobsThisFrame);
-	fprintf(outputFile, "Reducing slack by: %0.1f\n", *reduceSlackBy);
+	fprintf(outputFile, "Sporadic Job: Number of Sporadic Job this frame: %d\n", jobsThisFrame);
+	fprintf(outputFile, "Reducing slack by (due to acceptance of SJ): %0.1f\n", *reduceSlackBy);
 	*numJobsThisFrame = jobsThisFrame;
 	sporadicJobsThisFrame = realloc(sporadicJobsThisFrame, sizeof(SporadicJob) * jobsThisFrame);
 
