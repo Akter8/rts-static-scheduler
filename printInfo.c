@@ -324,7 +324,7 @@ printRunTimeSchedulingInfo(ScheduleFrame *framesData, int numFrames, int frameSi
 	for (int i = 0; i < numTasks; ++i)
 	{
 		fprintf(outputFile, "T%d: ", tasks[i].taskNum);
-		float min = FLT_MAX, max = -FLT_MAX, avg = 0;
+		float min = FLT_MAX, max = -FLT_MAX;
 		for (int j = 0; j < tasks[i].numInstances; ++j)
 		{
 			if (tasks[i].responseTimes[j] < min)

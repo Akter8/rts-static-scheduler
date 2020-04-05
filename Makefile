@@ -1,6 +1,6 @@
 # Variable declaration.
 CC = gcc
-flags = -c
+flags = -c -Wall
 executableName = test
 driver = driverMain
 intermediateOutputFile = periodicSchedule.txt
