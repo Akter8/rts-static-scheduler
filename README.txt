@@ -1,4 +1,4 @@
-# RTS-Assignment-2
+# RTS Assignment-2
 Name: Akhil Tarikere
 ID: 2017A7PS1916G
 Given a set of periodic, aperiodic and sporadic jobs in an RTS, finding a feasible schedule for the task set with valid frame sizes.
@@ -12,12 +12,6 @@ For a given in-phase input task set consisting of periodic tasks [Read the input
 	2. Sporadic jobs with cyclic EDF sporadic scheduler
 3. Enhance your implementation by relaxing the assumption on WCET. Assume that the actual execution time of a job can be lesser than or equal to the WCET of it (20% to 100% determined using a pseudo random function).
 
-
-### Tasks to be done
-- [ ] Make the fprintfs in the scheduler neat.
-- [ ] Check if there are any warnings while compiling.
-- [ ] Finish the README.
-- [ ] Test the program with lots of test cases for bugs.
 
 
 ### Tasks Completed
@@ -97,7 +91,7 @@ For a given in-phase input task set consisting of periodic tasks [Read the input
 		5	1.5	5
 		10	3.5	10
 		20	0.9	20
-	We could get away with splitting jobs of T2 into 4. But the INF algorithm might choose to split T2 into 3 and T3 into 2.
+	We could get away with splitting jobs of T2 into 4 jobs. But the INF algorithm might choose to split T2 into 3 and T3 into 2.
 13. This simulation does not consider any I/O operations or any voluntary suspensions by any jobs which is not the norm in the real world systems.
 
 
@@ -107,9 +101,10 @@ For a given in-phase input task set consisting of periodic tasks [Read the input
 
 
 ### How to compile
-On the CLI run "make" to compile and "make clean" to clean the compilation.
-One can change the required flags and the compiler in the Makefile if required.
-Please change the input files according to convenience and in the right format.
+* Please change the input files according to convenience and in the right format.
+* Make the required changes in the file names in configuration.h.
+* On the CLI run "make" to compile and "make clean" to clean the compilation.
+* The required flags and the compiler in the Makefile if required.
 
 
 ## Inputs required
